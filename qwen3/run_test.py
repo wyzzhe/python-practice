@@ -9,7 +9,7 @@ def run_test(base_url, route, place_id, token, count, concurrency):
         print(f"目标地址: {base_url}{route}")
         
         command = [
-            "python3", "scripts/model_concurrency_test.py",
+            "uv", "run", "qwen3/model_concurrency_test.py",
             "--base-url", base_url,
             "--route", route,
             "--place-id", place_id,
@@ -68,25 +68,25 @@ def main():
     # 可以根据需要调整这些值
     # test_configs = [{'concurrency': str(i), 'count': str(i)} for i in range(1, 301)]
     test_configs = [
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '5', 'count': '5'},
-        {'concurrency': '10', 'count': '10'},
-        {'concurrency': '15', 'count': '15'},
-        {'concurrency': '16', 'count': '16'},
-        {'concurrency': '17', 'count': '17'},
-        {'concurrency': '18', 'count': '18'},
-        {'concurrency': '19', 'count': '19'},
-        {'concurrency': '20', 'count': '20'},
-        {'concurrency': '25', 'count': '25'},
-        {'concurrency': '30', 'count': '30'},
-        {'concurrency': '35', 'count': '35'},
-        {'concurrency': '40', 'count': '40'},
-        {'concurrency': '45', 'count': '45'},
-        {'concurrency': '50', 'count': '50'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '5', 'count': '5'},
+        # {'concurrency': '10', 'count': '10'},
+        # {'concurrency': '15', 'count': '15'},
+        # {'concurrency': '16', 'count': '16'},
+        # {'concurrency': '17', 'count': '17'},
+        # {'concurrency': '18', 'count': '18'},
+        # {'concurrency': '19', 'count': '19'},
+        # {'concurrency': '20', 'count': '20'},
+        # {'concurrency': '25', 'count': '25'},
+        # {'concurrency': '30', 'count': '30'},
+        # {'concurrency': '35', 'count': '35'},
+        # {'concurrency': '40', 'count': '40'},
+        # {'concurrency': '45', 'count': '45'},
+        # {'concurrency': '50', 'count': '50'},
         # {'concurrency': '100', 'count': '100'},
         # {'concurrency': '110', 'count': '110'},
         # {'concurrency': '120', 'count': '120'},
@@ -109,7 +109,7 @@ def main():
         # {'concurrency': '2000', 'count': '2000'},
         # {'concurrency': '3000', 'count': '3000'},
         # {'concurrency': '4000', 'count': '4000'},
-        # {'concurrency': '5000', 'count': '5000'},
+        {'concurrency': '5000', 'count': '5000'},
     ]
     
     # 存储所有测试结果

@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 """
 单测
 
-python3 scripts/modelhandler_concurrency_test.py \
+python3 qwen3/modelhandler_concurrency_test.py \
   --base-url http://127.0.0.1:8888 \
   --route /mall_ai_model/question \
   --place-id 801 \
@@ -23,7 +23,7 @@ python3 scripts/modelhandler_concurrency_test.py \
 
 并发
 
-python3 scripts/model_concurrency_test.py \
+python3 qwen3/model_concurrency_test.py \
   --base-url https://screen.aibee.cn \
   --route /demo_ai_model/question \
   --place-id 801 \
@@ -258,8 +258,9 @@ class ModelHandlerConcurrencyTester:
     @staticmethod
     def generate_test_prompts(count: int = 20) -> List[str]:
         base_prompts = [
-            "你好"
-            # "金卡会员有哪些权益"
+            # "你好"
+            "金卡会员有哪些权益"
+            # "有日料吗"
         ]
         prompts: List[str] = []
         for i in range(count):
@@ -370,7 +371,7 @@ async def main_async(args: argparse.Namespace) -> None:
         prompts = tester.generate_test_prompts(args.count)
         summary, results = await tester.concurrent_test(prompts, args.concurrency)
         tester.print_results(summary, results)
-        tester.save_results_to_file(summary, results, f"scripts/model_concurrency_test_{model_name}.md")
+        tester.save_results_to_file(summary, results, f"qwen3/model_concurrency_test_{model_name}.md")
 
 
 def parse_args() -> argparse.Namespace:
