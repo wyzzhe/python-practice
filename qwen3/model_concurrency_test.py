@@ -17,7 +17,7 @@ python3 qwen3/modelhandler_concurrency_test.py \
   --base-url http://127.0.0.1:8888 \
   --route /mall_ai_model/question \
   --place-id 801 \
-  --token G2GJV8RPoUh35wLd \
+  --token G2GJV8RPoUh35000 \
   --mode 单测 \
   --prompt "你是什么模型"
 
@@ -259,8 +259,8 @@ class ModelHandlerConcurrencyTester:
     def generate_test_prompts(count: int = 20) -> List[str]:
         base_prompts = [
             # "你好"
-            "金卡会员有哪些权益"
-            # "有日料吗"
+            # "金卡会员有哪些权益"
+            "有日料吗"
         ]
         prompts: List[str] = []
         for i in range(count):
