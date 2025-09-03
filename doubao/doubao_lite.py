@@ -1,5 +1,9 @@
 import os
 from openai import OpenAI
+from dotenv import load_dotenv
+import asyncio
+
+load_dotenv()
 
 # 请确保您已将 API Key 存储在环境变量 ARK_API_KEY 中
 # 初始化Openai客户端，从环境变量中读取您的API Key
@@ -39,3 +43,19 @@ for chunk in stream:
         continue
     print(chunk.choices[0].delta.content, end="")
 print()
+
+# 异步调用
+async def main() -> None:
+    stream = await client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[
+            {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+            {"role": "user", "content": "常见的十字花科植物有哪些？"},
+        ],
+        stream=True
+    )
+    async for completion in stream:
+        print(completion.choices[0].delta.content, end="")
+    print()
+
+asyncio.run(main())
