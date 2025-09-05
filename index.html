@@ -293,8 +293,7 @@
                     <tr><td>100,000 - 200,000</td><td>1.5%</td></tr>
                     <tr><td>200,000 - 300,000</td><td>2.0%</td></tr>
                     <tr><td>300,000 - 500,000</td><td>2.5%</td></tr>
-                    <tr><td>500,000 - 1,000,000</td><td>3.0%</td></tr>
-                    <tr><td>1,000,000以上</td><td>3.0%</td></tr>
+                    <tr><td>500,000以上</td><td>3.0%</td></tr>
                 </tbody>
             </table>
         </div>
@@ -307,7 +306,7 @@
             { min: 100000, max: 200000, rate: 0.015 },
             { min: 200000, max: 300000, rate: 0.02 },
             { min: 300000, max: 500000, rate: 0.025 },
-            { min: 500000, max: 1000000, rate: 0.03 }
+            { min: 500000, max: Infinity, rate: 0.03 }
         ];
 
         function calculateCommission() {
@@ -345,33 +344,36 @@
             for (const rule of commissionRules) {
                 if (remainingAmount <= 0) break;
                 
-                const tierAmount = Math.min(remainingAmount, rule.max - rule.min);
-                if (tierAmount > 0) {
+                if (rule.max === Infinity) {
+                    // 50万元以上的部分，全部按3%计算
+                    const tierAmount = remainingAmount;
                     const tierCommission = tierAmount * rule.rate;
                     totalCommission += tierCommission;
                     
                     breakdown.push({
-                        tier_range: `${rule.min/10000}-${rule.max/10000}万元`,
+                        tier_range: "50万元以上",
                         amount: tierAmount,
                         rate: rule.rate,
                         commission: tierCommission
                     });
                     
-                    remainingAmount -= tierAmount;
+                    remainingAmount = 0;
+                } else {
+                    const tierAmount = Math.min(remainingAmount, rule.max - rule.min);
+                    if (tierAmount > 0) {
+                        const tierCommission = tierAmount * rule.rate;
+                        totalCommission += tierCommission;
+                        
+                        breakdown.push({
+                            tier_range: `${rule.min/10000}-${rule.max/10000}万元`,
+                            amount: tierAmount,
+                            rate: rule.rate,
+                            commission: tierCommission
+                        });
+                        
+                        remainingAmount -= tierAmount;
+                    }
                 }
-            }
-            
-            // 处理超过100万元的部分
-            if (remainingAmount > 0) {
-                const excessCommission = remainingAmount * 0.03;
-                totalCommission += excessCommission;
-                
-                breakdown.push({
-                    tier_range: "100万元以上",
-                    amount: remainingAmount,
-                    rate: 0.03,
-                    commission: excessCommission
-                });
             }
             
             const effectiveRate = totalCommission / salesAmount;

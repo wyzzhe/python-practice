@@ -16,7 +16,7 @@ class CommissionCalculator:
             (100000, 200000, 0.015),    # 10-20万元，1.5%
             (200000, 300000, 0.02),     # 20-30万元，2%
             (300000, 500000, 0.025),    # 30-50万元，2.5%
-            (500000, 1000000, 0.03),    # 50-100万元，3%
+            (500000, float('inf'), 0.03),    # 50万元以上，3%
         ]
     
     def calculate_commission(self, sales_amount):
@@ -45,31 +45,34 @@ class CommissionCalculator:
                 break
                 
             # 计算当前档位的金额
-            tier_amount = min(remaining_amount, max_amount - min_amount)
-            if tier_amount > 0:
+            if max_amount == float('inf'):
+                # 50万元以上的部分，全部按3%计算
+                tier_amount = remaining_amount
                 tier_commission = tier_amount * rate
                 total_commission += tier_commission
                 
                 breakdown.append({
-                    'tier_range': f"{min_amount//10000}-{max_amount//10000}万元",
+                    'tier_range': "50万元以上",
                     'amount': tier_amount,
                     'rate': rate,
                     'commission': tier_commission
                 })
                 
-                remaining_amount -= tier_amount
-        
-        # 如果销售额超过100万元，按3%计算超出部分
-        if remaining_amount > 0:
-            excess_commission = remaining_amount * 0.03
-            total_commission += excess_commission
-            
-            breakdown.append({
-                'tier_range': "100万元以上",
-                'amount': remaining_amount,
-                'rate': 0.03,
-                'commission': excess_commission
-            })
+                remaining_amount = 0
+            else:
+                tier_amount = min(remaining_amount, max_amount - min_amount)
+                if tier_amount > 0:
+                    tier_commission = tier_amount * rate
+                    total_commission += tier_commission
+                    
+                    breakdown.append({
+                        'tier_range': f"{min_amount//10000}-{max_amount//10000}万元",
+                        'amount': tier_amount,
+                        'rate': rate,
+                        'commission': tier_commission
+                    })
+                    
+                    remaining_amount -= tier_amount
         
         return {
             'sales_amount': sales_amount,
