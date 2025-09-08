@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提成计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-summary {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-summary h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .commission-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .effective-rate {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .breakdown {
+            margin-top: 20px;
+        }
+
+        .breakdown h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .breakdown-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .breakdown-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rules-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .rules-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .rules-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .rules-table th,
+        .rules-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .rules-table th {
+            background: #764ba2;
+            color: white;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .commission-amount {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>提成计算器</h1>
+            <p>根据销售额自动计算提成金额</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="salesAmount">销售额（元）</label>
+                <input type="number" id="salesAmount" placeholder="请输入销售额" step="1" min="0">
+            </div>
+            <button class="calculate-btn" onclick="calculateCommission()">计算提成</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-summary">
+                <h3>计算结果</h3>
+                <div class="commission-amount" id="commissionAmount">0.00 元</div>
+                <div class="effective-rate" id="effectiveRate">有效提成率: 0.00%</div>
+            </div>
+            
+            <div class="breakdown">
+                <h4>详细计算</h4>
+                <table class="breakdown-table" id="breakdownTable">
+                    <thead>
+                        <tr>
+                            <th>档位</th>
+                            <th>金额（元）</th>
+                            <th>提成率</th>
+                            <th>提成金额（元）</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="rules-section">
+            <h3>提成规则</h3>
+            <table class="rules-table">
+                <thead>
+                    <tr>
+                        <th>销售额（元）</th>
+                        <th>提成率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>0 - 100,000</td><td>1.0%</td></tr>
+                    <tr><td>100,000 - 200,000</td><td>1.5%</td></tr>
+                    <tr><td>200,000 - 300,000</td><td>2.0%</td></tr>
+                    <tr><td>300,000 - 500,000</td><td>2.5%</td></tr>
+                    <tr><td>500,000以上</td><td>3.0%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 提成计算规则（单位：元）
+        const commissionRules = [
+            { min: 0, max: 100000, rate: 0.01 },
+            { min: 100000, max: 200000, rate: 0.015 },
+            { min: 200000, max: 300000, rate: 0.02 },
+            { min: 300000, max: 500000, rate: 0.025 },
+            { min: 500000, max: Infinity, rate: 0.03 }
+        ];
+
+        function calculateCommission() {
+            const salesAmount = parseFloat(document.getElementById('salesAmount').value);
+            const resultSection = document.getElementById('resultSection');
+            
+            // 清除之前的错误信息
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // 验证输入
+            if (isNaN(salesAmount) || salesAmount < 0) {
+                showError('请输入有效的销售额（不能为负数）');
+                return;
+            }
+            
+            if (salesAmount === 0) {
+                showResult({
+                    sales_amount: 0,
+                    total_commission: 0,
+                    breakdown: [],
+                    effective_rate: 0
+                });
+                return;
+            }
+            
+            // 计算提成
+            let totalCommission = 0;
+            const breakdown = [];
+            let remainingAmount = salesAmount;
+            
+            // 按档位计算
+            for (const rule of commissionRules) {
+                if (remainingAmount <= 0) break;
+                
+                if (rule.max === Infinity) {
+                    // 50万元以上的部分，全部按3%计算
+                    const tierAmount = remainingAmount;
+                    const tierCommission = tierAmount * rule.rate;
+                    totalCommission += tierCommission;
+                    
+                    breakdown.push({
+                        tier_range: "50万元以上",
+                        amount: tierAmount,
+                        rate: rule.rate,
+                        commission: tierCommission
+                    });
+                    
+                    remainingAmount = 0;
+                } else {
+                    const tierAmount = Math.min(remainingAmount, rule.max - rule.min);
+                    if (tierAmount > 0) {
+                        const tierCommission = tierAmount * rule.rate;
+                        totalCommission += tierCommission;
+                        
+                        breakdown.push({
+                            tier_range: `${rule.min/10000}-${rule.max/10000}万元`,
+                            amount: tierAmount,
+                            rate: rule.rate,
+                            commission: tierCommission
+                        });
+                        
+                        remainingAmount -= tierAmount;
+                    }
+                }
+            }
+            
+            const effectiveRate = totalCommission / salesAmount;
+            
+            showResult({
+                sales_amount: salesAmount,
+                total_commission: totalCommission,
+                breakdown: breakdown,
+                effective_rate: effectiveRate
+            });
+        }
+        
+        function showResult(result) {
+            // 显示总提成金额
+            document.getElementById('commissionAmount').textContent = 
+                result.total_commission.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' 元';
+            
+            // 显示有效提成率
+            document.getElementById('effectiveRate').textContent = 
+                `有效提成率: ${(result.effective_rate * 100).toFixed(2)}%`;
+            
+            // 显示详细计算
+            const breakdownBody = document.getElementById('breakdownBody');
+            breakdownBody.innerHTML = '';
+            
+            result.breakdown.forEach(item => {
+                const row = breakdownBody.insertRow();
+                row.insertCell(0).textContent = item.tier_range;
+                row.insertCell(1).textContent = item.amount.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                row.insertCell(2).textContent = (item.rate * 100).toFixed(1) + '%';
+                row.insertCell(3).textContent = item.commission.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            });
+            
+            // 显示结果区域
+            document.getElementById('resultSection').classList.add('show');
+            
+            // 滚动到结果区域
+            document.getElementById('resultSection').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+        
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            const inputSection = document.querySelector('.input-section');
+            inputSection.appendChild(errorDiv);
+            
+            // 3秒后自动移除错误信息
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 3000);
+        }
+        
+        // 回车键计算
+        document.getElementById('salesAmount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateCommission();
+            }
+        });
+        
+        // 输入时清除错误信息
+        document.getElementById('salesAmount').addEventListener('input', function() {
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+        });
+    </script>
+</body>
+</html>
