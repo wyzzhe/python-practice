@@ -92,15 +92,15 @@ bot_client = OpenAI(
 )
 
 # Non-streaming:
-print("----- standard request -----")
-completion = bot_client.chat.completions.create(
-    model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
-    messages=[
-        {"role": "system", "content": "你是一个天气查询机器人，根据用户输入的城市如北京市，河南省郑州市查询天气。"},
-        {"role": "user", "content": "郑州2025年9月10日天气"},
-    ],
-)
-print(completion.choices[0].message.content)
+# print("----- standard request -----")
+# completion = bot_client.chat.completions.create(
+#     model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
+#     messages=[
+#         {"role": "system", "content": "你是一个天气查询机器人，根据用户输入的城市如北京市，河南省郑州市查询天气。"},
+#         {"role": "user", "content": "郑州2025年9月10日天气"},
+#     ],
+# )
+# print(completion.choices[0].message.content)
 # if hasattr(completion, "references"):
 #     print(completion.references)
 
@@ -120,21 +120,21 @@ print(completion.choices[0].message.content)
 # if hasattr(completion, "references"):
 #     print(completion.references)
 
-# # Streaming:
-# print("----- streaming request -----")
-# stream = bot_client.chat.completions.create(
-#     model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
-#     messages=[
-#         {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-#         {"role": "user", "content": "常见的十字花科植物有哪些？"},
-#     ],
-#     stream=True,
-# )
-# for chunk in stream:
-#     if hasattr(chunk, "references"):
-#         print(chunk.references)
-#     if not chunk.choices:
-#         continue
-#     if chunk.choices[0].delta.content:
-#         print(chunk.choices[0].delta.content, end="")
-# print()
+# Streaming:
+print("----- streaming request -----")
+stream = bot_client.chat.completions.create(
+    model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
+    messages=[
+        {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+        {"role": "user", "content": "常见的十字花科植物有哪些？"},
+    ],
+    stream=True,
+)
+for chunk in stream:
+    if hasattr(chunk, "references"):
+        print(chunk.references)
+    if not chunk.choices:
+        continue
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="")
+print()
