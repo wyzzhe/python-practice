@@ -2,6 +2,7 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+from datetime import datetime
 import time
 import asyncio
 
@@ -19,47 +20,54 @@ client = OpenAI(
 """
 对话机器人
 """
-# # Non-streaming:
-# print("----- standard request -----")
-# completion = client.chat.completions.create(
-#     model="doubao-1-5-lite-32k-250115",
-#     messages=[
-#         {"role": "system", "content": "你是人工智能助手"},
-#         {"role": "user", "content": "你好"},
-#     ],
-# )
-# print(completion.choices[0].message.content)
+streaming = True
+# Non-streaming:
+if not streaming:
+    print("----- standard request -----")
+    non_streaming_start = datetime.now()
+    completion = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[
+            {"role": "system", "content": "你是人工智能助手"},
+            {"role": "user", "content": "给我写篇作文"},
+        ],
+    )
+    non_streaming_end = datetime.now()
+    non_streaming_spend = non_streaming_end - non_streaming_start
+    print(f"non_streaming_spend {non_streaming_spend}")
+    print(completion.choices[0].message.content)
 
 # Streaming:
-# print("----- streaming request -----")
+elif streaming:
+    print("----- streaming request -----")
 
-# first_delay_time = 0
-# for i in range(1):
-#     start_time = time.time()
-#     stream = client.chat.completions.create(
-#         model="doubao-1-5-lite-32k-250115",
-#         messages=[
-#             {"role": "system", "content": "## 你是一个天气查询机器人"},
-#             {"role": "user", "content": "郑州今天天气怎么样"},
-#         ],
+    first_delay_time = 0
+    for i in range(1):
+        start_time = time.time()
+        stream = client.chat.completions.create(
+            model="doubao-1-5-lite-32k-250115",
+            messages=[
+                {"role": "system", "content": "## 你是一个天气查询机器人"},
+                {"role": "user", "content": "郑州今天天气怎么样"},
+            ],
 
-#         # 响应内容是否流式返回
-#         stream=True,
-#     )
-#     first_chunk_time = None
-#     for chunk in stream:
-#         if not chunk.choices:
-#             continue
+            # 响应内容是否流式返回
+            stream=True,
+        )
+        first_chunk_time = None
+        for chunk in stream:
+            if not chunk.choices:
+                continue
 
-#         if first_chunk_time is None:
-#             first_chunk_time = time.time()
-#             first_delay_time += first_chunk_time - start_time
-#             if i < 3:
-#                 print(f"首字延迟 {(first_chunk_time - start_time):.3f}秒")
-#         print(chunk.choices[0].delta.content, end="")
-# print()
-# print(f"平均 {i} 次首字延迟 {(first_delay_time / 100):.3f}秒")
-# print()
+            if first_chunk_time is None:
+                first_chunk_time = time.time()
+                first_delay_time += first_chunk_time - start_time
+                if i < 3:
+                    print(f"首字延迟 {(first_chunk_time - start_time):.3f}秒")
+            print(chunk.choices[0].delta.content, end="")
+    print()
+    print(f"平均 {i} 次首字延迟 {(first_delay_time / 100):.3f}秒")
+    print()
 
 # # 异步调用
 # async def main() -> None:
@@ -84,12 +92,12 @@ client = OpenAI(
 
 # 请确保您已将 API Key 存储在环境变量 ARK_API_KEY 中
 # 初始化Openai客户端，从环境变量中读取您的API Key
-bot_client = OpenAI(
-    # 此为默认路径，您可根据业务所在地域进行配置
-    base_url="https://ark.cn-beijing.volces.com/api/v3/bots",
-    # 从环境变量中获取您的 API Key
-    api_key=os.environ.get("ARK_API_KEY")
-)
+# bot_client = OpenAI(
+#     # 此为默认路径，您可根据业务所在地域进行配置
+#     base_url="https://ark.cn-beijing.volces.com/api/v3/bots",
+#     # 从环境变量中获取您的 API Key
+#     api_key=os.environ.get("ARK_API_KEY")
+# )
 
 # Non-streaming:
 # print("----- standard request -----")
@@ -121,20 +129,20 @@ bot_client = OpenAI(
 #     print(completion.references)
 
 # Streaming:
-print("----- streaming request -----")
-stream = bot_client.chat.completions.create(
-    model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
-    messages=[
-        {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-        {"role": "user", "content": "常见的十字花科植物有哪些？"},
-    ],
-    stream=True,
-)
-for chunk in stream:
-    if hasattr(chunk, "references"):
-        print(chunk.references)
-    if not chunk.choices:
-        continue
-    if chunk.choices[0].delta.content:
-        print(chunk.choices[0].delta.content, end="")
-print()
+# print("----- streaming request -----")
+# stream = bot_client.chat.completions.create(
+#     model="bot-20250910105252-sqqc5",  # bot-20250910105252-sqqc5 为您当前的智能体的ID，注意此处与Chat API存在差异。差异对比详见 SDK使用指南
+#     messages=[
+#         {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+#         {"role": "user", "content": "常见的十字花科植物有哪些？"},
+#     ],
+#     stream=True,
+# )
+# for chunk in stream:
+#     if hasattr(chunk, "references"):
+#         print(chunk.references)
+#     if not chunk.choices:
+#         continue
+#     if chunk.choices[0].delta.content:
+#         print(chunk.choices[0].delta.content, end="")
+# print()
