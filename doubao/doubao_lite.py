@@ -4,7 +4,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from datetime import datetime
 import time
-import asyncio
+# import asyncio  # 暂时注释掉，如需要异步功能可取消注释
 
 load_dotenv()
 
@@ -20,7 +20,7 @@ client = OpenAI(
 """
 对话机器人
 """
-streaming = True
+streaming = False
 # Non-streaming:
 if not streaming:
     print("----- standard request -----")
@@ -36,13 +36,26 @@ if not streaming:
     non_streaming_spend = non_streaming_end - non_streaming_start
     print(f"non_streaming_spend {non_streaming_spend}")
     print(completion.choices[0].message.content)
+    
+    # 输出 token 消耗统计
+    if hasattr(completion, 'usage') and completion.usage:
+        usage = completion.usage
+        print("\n=== Token 消耗统计 ===")
+        print(f"输入 tokens (prompt_tokens): {usage.prompt_tokens}")
+        print(f"输出 tokens (completion_tokens): {usage.completion_tokens}")
+        print(f"总 tokens (total_tokens): {usage.total_tokens}")
+        if hasattr(usage, 'input_tokens'):
+            print(f"输入 tokens (input_tokens): {usage.input_tokens}")
+        if hasattr(usage, 'output_tokens'):
+            print(f"输出 tokens (output_tokens): {usage.output_tokens}")
 
 # Streaming:
 elif streaming:
     print("----- streaming request -----")
 
     first_delay_time = 0
-    for i in range(1):
+    rounds = 1  # 修正循环次数
+    for i in range(rounds):
         start_time = time.time()
         stream = client.chat.completions.create(
             model="doubao-1-5-lite-32k-250115",
@@ -55,6 +68,8 @@ elif streaming:
             stream=True,
         )
         first_chunk_time = None
+        usage_info = None  # 存储 token 使用信息
+        
         for chunk in stream:
             if not chunk.choices:
                 continue
@@ -64,9 +79,30 @@ elif streaming:
                 first_delay_time += first_chunk_time - start_time
                 if i < 3:
                     print(f"首字延迟 {(first_chunk_time - start_time):.3f}秒")
-            print(chunk.choices[0].delta.content, end="")
+            
+            # 检查是否有内容输出
+            if chunk.choices[0].delta.content:
+                print(chunk.choices[0].delta.content, end="")
+            
+            # 检查是否有 usage 信息（通常在最后一个 chunk 中）
+            if hasattr(chunk, 'usage') and chunk.usage:
+                usage_info = chunk.usage
+                
     print()
-    print(f"平均 {i} 次首字延迟 {(first_delay_time / 100):.3f}秒")
+    print(f"平均 {rounds} 次首字延迟 {(first_delay_time / rounds):.3f}秒")
+    
+    # 输出流式请求的 token 消耗统计
+    if usage_info:
+        print("\n=== 流式请求 Token 消耗统计 ===")
+        print(f"输入 tokens (prompt_tokens): {usage_info.prompt_tokens}")
+        print(f"输出 tokens (completion_tokens): {usage_info.completion_tokens}")
+        print(f"总 tokens (total_tokens): {usage_info.total_tokens}")
+        if hasattr(usage_info, 'input_tokens'):
+            print(f"输入 tokens (input_tokens): {usage_info.input_tokens}")
+        if hasattr(usage_info, 'output_tokens'):
+            print(f"输出 tokens (output_tokens): {usage_info.output_tokens}")
+    else:
+        print("\n注意：流式请求中未获取到 token 使用信息")
     print()
 
 # # 异步调用
