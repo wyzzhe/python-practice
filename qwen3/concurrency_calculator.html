@@ -1,0 +1,376 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模型并发量计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#8B5CF6',
+                        neutral: '#1F2937',
+                        'neutral-light': '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card-shadow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral flex items-center">
+                <i class="fa fa-calculator text-primary mr-3"></i>
+                AI模型并发量计算器
+            </h1>
+            <p class="text-gray-600 mt-2">基于显存和模型参数计算最大并发请求数</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 输入区域 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h2 class="text-xl font-semibold text-neutral mb-6 flex items-center">
+                        <i class="fa fa-sliders text-primary mr-2"></i>参数设置
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 硬件参数 -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-medium text-gray-700 border-b pb-2">硬件参数</h3>
+                            
+                            <div>
+                                <label for="gpu_memory" class="block text-sm font-medium text-gray-700 mb-1">GPU总显存 (GB)</label>
+                                <div class="relative">
+                                    <input type="number" id="gpu_memory" value="80" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                                    <span class="absolute right-3 top-2.5 text-gray-500">GB</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="framework_buffer" class="block text-sm font-medium text-gray-700 mb-1">框架缓存与预留 (GB)</label>
+                                <div class="relative">
+                                    <input type="number" id="framework_buffer" value="8" min="0" step="0.5" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                                    <span class="absolute right-3 top-2.5 text-gray-500">GB</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 模型参数 -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-medium text-gray-700 border-b pb-2">模型参数</h3>
+                            
+                            <div>
+                                <label for="model_weight" class="block text-sm font-medium text-gray-700 mb-1">模型权重大小 (GB)</label>
+                                <div class="relative">
+                                    <input type="number" id="model_weight" value="32" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                                    <span class="absolute right-3 top-2.5 text-gray-500">GB</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="layers" class="block text-sm font-medium text-gray-700 mb-1">模型层数 (L)</label>
+                                <input type="number" id="layers" value="64" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                            </div>
+                            
+                            <div>
+                                <label for="hidden_dim" class="block text-sm font-medium text-gray-700 mb-1">隐藏维度 (D)</label>
+                                <input type="number" id="hidden_dim" value="5120" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                            </div>
+                            
+                            <div>
+                                <label for="precision" class="block text-sm font-medium text-gray-700 mb-1">精度 (字节/元素)</label>
+                                <select id="precision" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                                    <option value="1">FP8 (1字节)</option>
+                                    <option value="2">FP16 (2字节)</option>
+                                    <option value="4">FP32 (4字节)</option>
+                                    <option value="0.5">INT4 (0.5字节)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 对话参数 -->
+                    <div class="mt-6 space-y-4">
+                        <h3 class="text-lg font-medium text-gray-700 border-b pb-2">对话参数</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="short_dialog" class="block text-sm font-medium text-gray-700 mb-1">短对话平均长度 (token)</label>
+                                <input type="number" id="short_dialog" value="512" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                            </div>
+                            
+                            <div>
+                                <label for="long_dialog" class="block text-sm font-medium text-gray-700 mb-1">长文档平均长度 (token)</label>
+                                <input type="number" id="long_dialog" value="2048" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                            </div>
+                            
+                            <div>
+                                <label for="extra_long_dialog" class="block text-sm font-medium text-gray-700 mb-1">超长摘要平均长度 (token)</label>
+                                <input type="number" id="extra_long_dialog" value="4096" min="1" step="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all-300">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button id="calculate_btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-lg transition-all-300 flex items-center">
+                                <i class="fa fa-calculator mr-2"></i> 计算并发量
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 计算公式 -->
+                <div class="bg-white rounded-xl p-6 card-shadow mt-6">
+                    <h2 class="text-xl font-semibold text-neutral mb-4 flex items-center">
+                        <i class="fa fa-formula text-primary mr-2"></i>计算公式
+                    </h2>
+                    <div class="bg-neutral-light p-4 rounded-lg">
+                        <p class="text-gray-700 mb-2">可用 KV-Cache 上限 = GPU总显存 - 模型权重 - 框架缓存与预留</p>
+                        <p class="text-gray-700 mb-2">每 token 缓存 = 层数 × 隐藏维度 × 2 × 字节/元素</p>
+                        <p class="text-gray-700 mb-2">最大并发 token 数 = 可用 KV-Cache 上限 ÷ 每 token 缓存</p>
+                        <p class="text-gray-700">并发请求数 = 最大并发 token 数 ÷ 平均 token 长度</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 结果展示区域 -->
+            <div>
+                <div class="bg-white rounded-xl p-6 card-shadow sticky top-4">
+                    <h2 class="text-xl font-semibold text-neutral mb-6 flex items-center">
+                        <i class="fa fa-bar-chart text-primary mr-2"></i>计算结果
+                    </h2>
+                    
+                    <div id="results" class="space-y-6">
+                        <!-- 显存分配 -->
+                        <div>
+                            <h3 class="text-base font-medium text-gray-700 mb-3">显存分配 (GB)</h3>
+                            <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                                <div id="memory_chart" class="h-4 rounded-full relative overflow-hidden">
+                                    <div id="weight_segment" class="absolute top-0 left-0 h-full bg-primary" style="width: 40%">
+                                        <span class="absolute right-2 text-xs text-white font-medium">权重</span>
+                                    </div>
+                                    <div id="kv_segment" class="absolute top-0 left-[40%] h-full bg-secondary" style="width: 50%">
+                                        <span class="absolute right-2 text-xs text-white font-medium">KV缓存</span>
+                                    </div>
+                                    <div id="buffer_segment" class="absolute top-0 left-[90%] h-full bg-gray-400" style="width: 10%">
+                                        <span class="absolute right-2 text-xs text-white font-medium">预留</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-sm text-center">
+                                <div class="bg-primary/10 p-2 rounded">
+                                    <p class="text-primary font-medium" id="weight_value">32 GB</p>
+                                    <p class="text-gray-600">模型权重</p>
+                                </div>
+                                <div class="bg-secondary/10 p-2 rounded">
+                                    <p class="text-secondary font-medium" id="kv_value">40 GB</p>
+                                    <p class="text-gray-600">KV缓存</p>
+                                </div>
+                                <div class="bg-gray-200 p-2 rounded">
+                                    <p class="text-gray-700 font-medium" id="buffer_value">8 GB</p>
+                                    <p class="text-gray-600">预留空间</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- KV缓存信息 -->
+                        <div class="bg-neutral-light p-4 rounded-lg">
+                            <h3 class="text-base font-medium text-gray-700 mb-2">KV缓存信息</h3>
+                            <p class="text-gray-600 mb-1">每 token 缓存: <span id="per_token_cache" class="font-medium">0.64 MB</span></p>
+                            <p class="text-gray-600">最大并发 token 数: <span id="max_tokens" class="font-medium">62,500</span></p>
+                        </div>
+                        
+                        <!-- 并发量结果 -->
+                        <div>
+                            <h3 class="text-base font-medium text-gray-700 mb-3">最大并发请求数</h3>
+                            <div class="space-y-3">
+                                <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-all-300">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-gray-700">短对话 (<span id="short_dialog_display">512</span> token)</p>
+                                        <p id="short_concurrency" class="text-2xl font-bold text-primary">120</p>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mt-1">适合智能客服、简单问答等场景</p>
+                                </div>
+                                
+                                <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-all-300">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-gray-700">长文档 (<span id="long_dialog_display">2048</span> token)</p>
+                                        <p id="long_concurrency" class="text-2xl font-bold text-primary">30</p>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mt-1">适合文档理解、知识问答等场景</p>
+                                </div>
+                                
+                                <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-all-300">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-gray-700">超长摘要 (<span id="extra_long_dialog_display">4096</span> token)</p>
+                                        <p id="extra_long_concurrency" class="text-2xl font-bold text-primary">15</p>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mt-1">适合长文档摘要、报告生成等场景</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 优化建议 -->
+                        <div>
+                            <h3 class="text-base font-medium text-gray-700 mb-2">优化建议</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li class="flex items-start">
+                                    <i class="fa fa-lightbulb-o text-accent mt-1 mr-2"></i>
+                                    <span>减少平均token长度可提高并发量</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-lightbulb-o text-accent mt-1 mr-2"></i>
+                                    <span>使用INT4量化可减少权重占用，增加KV缓存空间</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-lightbulb-o text-accent mt-1 mr-2"></i>
+                                    <span>多卡并行可分布KV缓存，显著提高并发能力</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-neutral text-white mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="mb-2">AI模型并发量计算器</p>
+                <p class="text-gray-400 text-sm">基于显存和模型参数估算最大并发请求数</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 计算按钮点击事件
+            document.getElementById('calculate_btn').addEventListener('click', calculateConcurrency);
+            
+            // 输入值变化时自动更新显示
+            const inputs = ['short_dialog', 'long_dialog', 'extra_long_dialog'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    document.getElementById(`${id}_display`).textContent = this.value;
+                });
+            });
+            
+            // 初始计算
+            calculateConcurrency();
+        });
+        
+        // 计算并发量
+        function calculateConcurrency() {
+            // 获取输入值
+            const gpuMemory = parseFloat(document.getElementById('gpu_memory').value);
+            const modelWeight = parseFloat(document.getElementById('model_weight').value);
+            const frameworkBuffer = parseFloat(document.getElementById('framework_buffer').value);
+            const layers = parseInt(document.getElementById('layers').value);
+            const hiddenDim = parseInt(document.getElementById('hidden_dim').value);
+            const precision = parseFloat(document.getElementById('precision').value);
+            const shortDialog = parseInt(document.getElementById('short_dialog').value);
+            const longDialog = parseInt(document.getElementById('long_dialog').value);
+            const extraLongDialog = parseInt(document.getElementById('extra_long_dialog').value);
+            
+            // 计算显存分配
+            const kvCache = gpuMemory - modelWeight - frameworkBuffer;
+            
+            // 计算每token缓存大小 (MB)
+            // 公式: 层数 × 隐藏维度 × 2 × 字节/元素 / 1024^2
+            const perTokenCacheMB = (layers * hiddenDim * 2 * precision) / (1024 * 1024);
+            
+            // 计算最大并发token数
+            // 转换单位: GB -> MB (× 1024)
+            const maxTokens = Math.floor((kvCache * 1024) / perTokenCacheMB);
+            
+            // 计算不同场景的并发量
+            const shortConcurrency = Math.floor(maxTokens / shortDialog);
+            const longConcurrency = Math.floor(maxTokens / longDialog);
+            const extraLongConcurrency = Math.floor(maxTokens / extraLongDialog);
+            
+            // 更新结果显示
+            updateResults({
+                gpuMemory,
+                modelWeight,
+                frameworkBuffer,
+                kvCache,
+                perTokenCacheMB,
+                maxTokens,
+                shortConcurrency,
+                longConcurrency,
+                extraLongConcurrency,
+                shortDialog,
+                longDialog,
+                extraLongDialog
+            });
+        }
+        
+        // 更新结果显示
+        function updateResults(data) {
+            // 更新显存分配
+            document.getElementById('weight_value').textContent = `${data.modelWeight} GB`;
+            document.getElementById('kv_value').textContent = `${data.kvCache.toFixed(1)} GB`;
+            document.getElementById('buffer_value').textContent = `${data.frameworkBuffer} GB`;
+            
+            // 计算显存占比
+            const totalMemory = data.gpuMemory;
+            const weightPercent = (data.modelWeight / totalMemory) * 100;
+            const kvPercent = (data.kvCache / totalMemory) * 100;
+            const bufferPercent = (data.frameworkBuffer / totalMemory) * 100;
+            
+            // 更新显存图表
+            document.getElementById('weight_segment').style.width = `${weightPercent}%`;
+            document.getElementById('kv_segment').style.width = `${kvPercent}%`;
+            document.getElementById('kv_segment').style.left = `${weightPercent}%`;
+            document.getElementById('buffer_segment').style.width = `${bufferPercent}%`;
+            document.getElementById('buffer_segment').style.left = `${weightPercent + kvPercent}%`;
+            
+            // 更新KV缓存信息
+            document.getElementById('per_token_cache').textContent = `${data.perTokenCacheMB.toFixed(2)} MB`;
+            document.getElementById('max_tokens').textContent = data.maxTokens.toLocaleString();
+            
+            // 更新并发量结果
+            document.getElementById('short_concurrency').textContent = data.shortConcurrency;
+            document.getElementById('long_concurrency').textContent = data.longConcurrency;
+            document.getElementById('extra_long_concurrency').textContent = data.extraLongConcurrency;
+            
+            // 更新对话长度显示
+            document.getElementById('short_dialog_display').textContent = data.shortDialog;
+            document.getElementById('long_dialog_display').textContent = data.longDialog;
+            document.getElementById('extra_long_dialog_display').textContent = data.extraLongDialog;
+            
+            // 添加结果更新动画
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.classList.add('bg-primary/5');
+            setTimeout(() => {
+                resultsContainer.classList.remove('bg-primary/5');
+            }, 500);
+        }
+    </script>
+
+
+</body></html>
