@@ -259,8 +259,8 @@ class ModelHandlerConcurrencyTester:
     def generate_test_prompts(count: int = 20) -> List[str]:
         base_prompts = [
             # "你好"
-            # "会员权益"
-            "买裤子"
+            "会员权益"
+            # "买裤子"
         ]
         prompts: List[str] = []
         for i in range(count):
