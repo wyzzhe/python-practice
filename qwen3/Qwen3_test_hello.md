@@ -1,3 +1,12 @@
+UserInput=你好 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.237s | Duration=0.237s  [Token] Input=5321 | Output=4 | Sum=5325
+UserInput=你好 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.258s | Duration=0.258s  [Token] Input=5321 | Output=4 | Sum=5325
+UserInput=你好 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.247s | Duration=0.247s  [Token] Input=5321 | Output=4 | Sum=5325
+UserInput=你好 | PromptName=checkInputHasStore | Model=Qwen3-32B-FP8  [Time] First=0.198s | Duration=0.198s  [Token] Input=11793 | Output=3 | Sum=11796
+UserInput=你好 | PromptName=checkInputHasStore | Model=Qwen3-32B-FP8  [Time] First=0.202s | Duration=0.202s  [Token] Input=11793 | Output=3 | Sum=11796
+UserInput=你好 | PromptName=checkInputHasStore | Model=Qwen3-32B-FP8  [Time] First=8.258s | Duration=8.258s  [Token] Input=11793 | Output=3 | Sum=11796
+UserInput=你好 | PromptName=getChat | Model=Qwen3-32B-FP8  [Time] First=0.156s | Duration=1.318s  [Token] Input=5982 | Output=38 | Sum=6020
+UserInput=你好 | PromptName=getChat | Model=Qwen3-32B-FP8  [Time] First=0.140s | Duration=1.306s  [Token] Input=5982 | Output=38 | Sum=6020
+UserInput=你好 | PromptName=getChat | Model=Qwen3-32B-FP8  [Time] First=4.091s | Duration=5.259s  [Token] Input=5982 | Output=38 | Sum=6020
 
 
 
