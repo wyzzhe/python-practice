@@ -17,7 +17,7 @@ def run_test(base_url, route, place_id, token, count, concurrency):
             "--mode", "并发",
             "--count", count,
             "--concurrency", concurrency,
-            "--timeout", "60"
+            "--timeout", "120"
         ]
         
         start_time = time.time()
@@ -70,10 +70,13 @@ def main():
     # test_configs = [{'concurrency': str(i), 'count': str(i)} for i in range(1, 301)]
     test_configs = [
         {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
-        {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        # {'concurrency': '1', 'count': '1'},
+        {'concurrency': '2', 'count': '2'},
+        {'concurrency': '3', 'count': '3'},
+        {'concurrency': '4', 'count': '4'},
         {'concurrency': '5', 'count': '5'},
         {'concurrency': '10', 'count': '10'},
         {'concurrency': '15', 'count': '15'},
