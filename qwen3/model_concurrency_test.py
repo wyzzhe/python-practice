@@ -53,7 +53,7 @@ class ModelHandlerConcurrencyTester:
         token: str = "",
         session_prefix: str = "test-session",
         intention: Optional[str] = None,
-        request_timeout: float = 120.0,
+        request_timeout: float = 60.0,
         count: int = 10,
     ) -> None:
         self.base_url = base_url.rstrip("/")
@@ -259,8 +259,8 @@ class ModelHandlerConcurrencyTester:
     def generate_test_prompts(count: int = 20) -> List[str]:
         base_prompts = [
             # "你好"
-            # "金卡会员有哪些权益"
-            "有日料吗"
+            "会员权益"
+            # "有日料吗"
         ]
         prompts: List[str] = []
         for i in range(count):
@@ -382,7 +382,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--token", default="", help="header: token，place_id 非 720 时建议提供")
     parser.add_argument("--session-prefix", default="test-session", help="session_id 前缀")
     parser.add_argument("--intention", default=None, help="可选的 intention 请求头")
-    parser.add_argument("--timeout", type=float, default=120.0, help="单个请求超时(秒)")
+    parser.add_argument("--timeout", type=float, default=60.0, help="单个请求超时(秒)")
 
     parser.add_argument("--mode", choices=["单测", "并发"], default="并发", help="运行模式：单测/并发")
     parser.add_argument("--prompt", default="", help="单测模式下的提示词")
