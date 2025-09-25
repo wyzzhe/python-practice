@@ -1,3 +1,4 @@
+# Qwen3-32B-FP8 并发测试结果
 UserInput=会员权益 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.270s | Duration=0.270s  [Token] Input=5322 | Output=4 | Sum=5326
 UserInput=会员权益 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.276s | Duration=0.276s  [Token] Input=5322 | Output=4 | Sum=5326
 UserInput=会员权益 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time] First=0.577s | Duration=0.577s  [Token] Input=5322 | Output=4 | Sum=5326
@@ -5,6 +6,13 @@ UserInput=会员权益 | PromptName=intentionPrompt | Model=Qwen3-32B-FP8  [Time
 UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-32B-FP8  [Time] First=0.164s | Duration=21.167s  [Token] Input=2543 | Output=770 | Sum=3313
 UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-32B-FP8  [Time] First=1.692s | Duration=22.672s  [Token] Input=2543 | Output=770 | Sum=3313
 UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-32B-FP8  [Time] First=0.187s | Duration=21.216s  [Token] Input=2543 | Output=770 | Sum=3313
+# Qwen3-8B-FP8 并发测试结果
+UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-8B-FP8  [Time] First=0.241s | Duration=7.839s  [Token] Input=2543 | Output=763 | Sum=3306
+UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-8B-FP8  [Time] First=0.161s | Duration=7.758s  [Token] Input=2543 | Output=763 | Sum=3306
+UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-8B-FP8  [Time] First=0.090s | Duration=7.685s  [Token] Input=2543 | Output=763 | Sum=3306
+UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-8B-FP8  [Time] First=0.091s | Duration=9.252s  [Token] Input=2543 | Output=763 | Sum=3306
+UserInput=会员权益 | PromptName=memberResult | Model=Qwen3-8B-FP8  [Time] First=0.130s | Duration=9.174s  [Token] Input=2543 | Output=754 | Sum=3297
+
 
 # Qwen3-32B-FP8 并发测试结果
 

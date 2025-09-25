@@ -34,7 +34,7 @@ python3 qwen3/model_concurrency_test.py \
 """
 
 load_dotenv()
-model_name = os.environ.get("MODEL_NAME", "Qwen3-32B-FP8")
+model_name = os.environ.get("MODEL_NAME", "Qwen3-8B-FP8")
 
 class ModelHandlerConcurrencyTester:
     """对 Tornado 的 ModelHandler 进行并发测试的工具。
