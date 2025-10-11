@@ -12,6 +12,7 @@ import datetime
 import warnings
 import wave  # 使用Python内置的wave模块，无需额外安装
 import orderResult
+from pathlib import Path
 
 # 忽略SSL验证警告（生产环境建议开启验证）
 warnings.filterwarnings("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
@@ -251,10 +252,12 @@ class XfyunAsrClient:
 
 if __name__ == "__main__":
     # -------------------------- 请替换为你的真实参数 --------------------------
-    XFYUN_APPID = "XXXXXXXX"  # 你的讯飞appId
-    XFYUN_ACCESS_KEY_ID = "XXXXXXXXXXXXXXXXXXXXXXXX"  # 你的accessKeyId
-    XFYUN_ACCESS_KEY_SECRET = "XXXXXXXXXXXXXXXXXXXXXXXX"  # 你的accessKeySecret
-    AUDIO_FILE = "python\\audio\\lfasr_涉政.wav"  # WAV音频文件路径
+    XFYUN_APPID = "7f1d3da6"  # 你的讯飞appId
+    XFYUN_ACCESS_KEY_ID = "5afd6fab643305fb3b46780aec038e00"  # 你的accessKeyId
+    XFYUN_ACCESS_KEY_SECRET = "OGJmMTU2OTRkMDc4N2U2YTY5OGIxMzIy"  # 你的accessKeySecret
+    BASE_DIR = Path(__file__).resolve().parent
+    AUDIO_FILE = str(BASE_DIR / "audio" / "5.wav")
+    # AUDIO_FILE = "python\\audio\\lfasr_涉政.wav"  # WAV音频文件路径
     # --------------------------------------------------------------------------
 
     try:
