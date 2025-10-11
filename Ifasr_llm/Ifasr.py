@@ -256,7 +256,7 @@ if __name__ == "__main__":
     XFYUN_ACCESS_KEY_ID = "5afd6fab643305fb3b46780aec038e00"  # 你的accessKeyId
     XFYUN_ACCESS_KEY_SECRET = "OGJmMTU2OTRkMDc4N2U2YTY5OGIxMzIy"  # 你的accessKeySecret
     BASE_DIR = Path(__file__).resolve().parent
-    AUDIO_FILE = str(BASE_DIR / "audio" / "5.wav")
+    AUDIO_FILE = str(BASE_DIR / "audio" / "sch.wav")
     # AUDIO_FILE = "python\\audio\\lfasr_涉政.wav"  # WAV音频文件路径
     # --------------------------------------------------------------------------
 
