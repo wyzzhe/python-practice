@@ -14,3 +14,5 @@ Thumbs.db
 # Secrets
 .env
 *.jpg
+*.rar
+*.xlsx

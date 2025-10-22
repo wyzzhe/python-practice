@@ -6,7 +6,7 @@ import redis
 
 import requests
 from datetime import timedelta
-from time import sleep
+from time import sleep, perf_counter
 from openpyxl import Workbook, load_workbook
 from question import place_questions
 
@@ -138,8 +138,20 @@ def check_100_question(place_id, question, env):
         wb = Workbook()
         ws = wb.active
         ws.title = "Sheet1"
-        ws.append(fieldnames)
+        # 扩展表头，加入计时字段
+        ws.append(fieldnames + ["ttft_ms", "tlat_ms"])
         wb.save(excel_filename)
+    total_iters = len(questions) * max(1, len(intentions))
+    done_iters = 0
+
+    def print_progress(done: int, total: int):
+        total = max(total, 1)
+        width = 30
+        pct = done / total
+        filled = int(width * pct)
+        bar = "#" * filled + "." * (width - filled)
+        print(f"\r进度 [{bar}] {done}/{total} ({pct*100:.1f}%)", end="", flush=True)
+    print_progress(done_iters, total_iters)
     for s in questions:
         for old_intention in intentions:
             sleep(5)
@@ -161,7 +173,9 @@ def check_100_question(place_id, question, env):
                 redis_client.set(f"agent_current_intention:{place_id}_{user_id}", old_intention, ex=HISTORY_REDIS_TTL)
 
             data = json.dumps(dataDict)
-            response = requests.post(url, data=data, headers=headers)
+            start_time = perf_counter()
+            first_token_time = None
+            response = requests.post(url, data=data, headers=headers, stream=True)
             del_current_intention(place_id, user_id)
             global_info.food_history_user = []
             global_info.food_history_assistant = []
@@ -171,9 +185,14 @@ def check_100_question(place_id, question, env):
             global_info.old_rewritten_question = None
 
             res = bytearray()
-            for chunk in response:
+            for chunk in response.iter_content(chunk_size=None):
+                if not chunk:
+                    continue
+                if first_token_time is None:
+                    first_token_time = perf_counter()
                 res.extend(chunk)
             result = res.decode('utf-8')
+            end_time = perf_counter()
 
             temp_str = result.split('event:finish')[-1]
             data_str = temp_str.split('data:')[-1]
@@ -192,10 +211,14 @@ def check_100_question(place_id, question, env):
                         sendResult += json.dumps(data, ensure_ascii=False)
             except json.JSONDecodeError as e:
                 print("JSON 解析失败:", e)
+            ttft_ms = int((first_token_time - start_time) * 1000) if first_token_time else None
+            tlat_ms = int((end_time - start_time) * 1000)
             resDict = {
                 "text": s,
                 "old_intention": old_intention,
-                "result": sendResult
+                "result": sendResult,
+                "ttft_ms": ttft_ms,
+                "tlat_ms": tlat_ms,
             }
             print(resDict)
             final_result.append(resDict)
@@ -203,11 +226,15 @@ def check_100_question(place_id, question, env):
             try:
                 wb = load_workbook(excel_filename)
                 ws = wb.active
-                ws.append([resDict["text"], resDict["old_intention"], resDict["result"]])
+                # 与表头顺序对应写入
+                ws.append([resDict["text"], resDict["old_intention"], resDict["result"], resDict["ttft_ms"], resDict["tlat_ms"]])
                 wb.save(excel_filename)
             except Exception as e:
                 print(f"写入 Excel 失败: {e}")
+            done_iters += 1
+            print_progress(done_iters, total_iters)
             sleep(1)
+    print()  # 换行，结束进度条
     print(f"数据已逐行写入文件{excel_filename}")
     print(f"开始时间：{t}")
     print(f"结束时间：{datetime.now()}")
