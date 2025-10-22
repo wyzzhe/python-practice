@@ -159,8 +159,8 @@ def check_100_question(place_id, question, env):
 
             headers = {
                 "Content-Type": "application/json",
-                "token": "G2GJV8RPoUh35wLd",
-                "session_id": "G2GJV8RPoUh35wLd",
+                "token": user_id,
+                "session_id": user_id,
             }
 
             dataDict = {
