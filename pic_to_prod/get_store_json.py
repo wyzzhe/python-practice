@@ -30,11 +30,16 @@ def fetch_store_data(store_id: str, store_name: str) -> bool:
         
         data = response.json()
         
-        # 创建目录
-        os.makedirs(store_name, exist_ok=True)
-        
+        # 获取当前脚本所在目录
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        json_root = os.path.join(script_dir, 'panorama_json')
+
+        # 构建目标目录路径
+        store_dir = os.path.join(json_root, store_name)
+        os.makedirs(store_dir, exist_ok=True)
+
         # 保存文件
-        filename = f"{store_name}/{store_name}.json"
+        filename = os.path.join(store_dir, f"{store_name}.json")
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         
@@ -73,9 +78,47 @@ if __name__ == "__main__":
     # 你的店铺列表
     stores = {
         "BIRKENSTOCK": "rnigHTJW6gZ1WvN8",
-        "JOMALONE": "wProWw3VWvxMXjSe"
-        # 可以继续添加更多店铺...
-        # "店铺名": "store_id",
+        "JOMALONE": "wProWw3VWvxMXjSe",
+        "MCM": "IggvX5NAGCBYGghG",
+        "HOURGLASS": "t9UIduAKaGQ6iSpL",
+        "SK-2": "WURVaubhFG1Zo4i7",
+        "ARMANI": "3JDW9p6znrMepLeW",
+        "Whoo": "jZodpniiOIyKB0T4",
+        "apm": "hmYDdSnqARaUL53I",
+        "PRADA": "ak3kgLadqHujKhub",
+        "BVLGARI": "LpyhRRXZa4G4DSxm",
+        "GUERLAIN": "0GqnCykmp5mOeGoQ",
+        "JORDAN": "HDUJQhI8E18QsxPk",
+        "SKINCEUTICALS": "xzGVEl38OXW9Zid5",
+        "BROMPTON": "N1vfzj3dO5rgiSJt",
+        "BOBBIBROWN": "6NLu57R9xBvtHe6V",
+        "ACQUADIPARMA": "O8mlHKnzTO2mbOmY",
+        "cledepeau": "ZcuSRtGblQozinwK",
+        "TOMFORD": "JJ9Gbpcytf9gwCSN",
+        "HERMES": "P1BLhggCACUmdSS3",
+        "LANCOME": "rUfFij7SItdZtJXJ",
+        "DECORTE": "SsH8RekNya3OOPKz",
+        "VALMONT": "p5R3uVLXilDq9RhE",
+        "sisly": "MMzt3bZ1qXnsgSKc",
+        "laprairie": "FOoMcyY53FdQ4QMZ",
+        "Eland": "w5dYvSXJ0hwxwK86",
+        "CLARINS": "vXYYtYkxYtWOTRZh",
+        "13DEMARZO": "8G9EN0maAHsqvbnV",
+        "WE11DONE": "lwsugpDHzMY1zObr",
+        "MICHAELKORS": "FBYSLzoCVQ8mihaZ",
+        "蔚来": "q9miW0WJbi7HycrE",
+        "BALLY": "93yqMh6CZEOmksbE",
+        "OMEGA": "nKNnCpr4FVuyprVu",
+        "Caurtier": "dnMffFWJ7BRKDrTU",
+        "HEFANG": "F0iNsPY8PQJluclQ",
+        "CUCCI": "8ZmBSWC9VvAnKkZG",
+        "IWC": "znTthd2FSEnmjQLV",
+        "智己": "i3fumkKm7tFtYusJ",
+        "睿锦尚品": "P0xC1z9hVr3zmJmo",
+        "TUDOR": "ZHvseHy0ATYHaRyN",
+        "L'OCCITANE": "fuH9KBjx2TzSNzGf",
+        "DIOR": "Pykl9tIdgeXnq00A",
+        "HIEIDO": "RE8KrirSDSt6Y5l2"
     }
     
     batch_fetch_stores(stores, delay=0.5)

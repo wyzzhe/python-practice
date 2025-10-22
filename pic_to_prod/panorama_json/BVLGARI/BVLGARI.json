@@ -1,0 +1,255 @@
+{
+  "request_id": "1fe60a44-56eb-43c9-9b94-8644520776b8",
+  "error_no": 200,
+  "error_msg": "success",
+  "data": {
+    "cursor_icon": "",
+    "description": "https://robot-vr-public.cdn.bcebos.com/process_log/b394910f42024154b01980b216266ea9.log",
+    "desktop_loading_picture": "",
+    "floor_nb": "-1",
+    "floor_plan_picture": "",
+    "id": 31671,
+    "location_nb": "-1",
+    "logo": "",
+    "mall_id": 1,
+    "modelPath": "https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/model",
+    "texture_path": "",
+    "panorama_icon_id": 0,
+    "phone_loading_picture": "",
+    "picture_selections": "[]",
+    "preview_img": "https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_f_low",
+    "source": 0,
+    "store_name": "郑州正弘城：L1BVLGARI-子图1",
+    "visit_nb": 0,
+    "ground_expression": [],
+    "initial_view": {
+      "id": 18122,
+      "roaming_direction_x": 1.0,
+      "roaming_direction_y": 0.0,
+      "roaming_direction_z": 0.0,
+      "roaming_panorama_id": 1333524,
+      "store_id": 31671,
+      "three_d_direction_x": 0,
+      "three_d_direction_y": 0,
+      "three_d_direction_z": 0,
+      "three_d_panorama_id": 0
+    },
+    "panorama_list": [
+      {
+        "id": 1333524,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/0_b_low\"]",
+        "seq_id": 0,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/0_b_0-0\", \"b394910f42024154b01980b216266ea9/0_b_0-1\", \"b394910f42024154b01980b216266ea9/0_b_1-0\", \"b394910f42024154b01980b216266ea9/0_b_1-1\", \"b394910f42024154b01980b216266ea9/0_d_0-0\", \"b394910f42024154b01980b216266ea9/0_d_0-1\", \"b394910f42024154b01980b216266ea9/0_d_1-0\", \"b394910f42024154b01980b216266ea9/0_d_1-1\", \"b394910f42024154b01980b216266ea9/0_f_0-0\", \"b394910f42024154b01980b216266ea9/0_f_0-1\", \"b394910f42024154b01980b216266ea9/0_f_1-0\", \"b394910f42024154b01980b216266ea9/0_f_1-1\", \"b394910f42024154b01980b216266ea9/0_l_0-0\", \"b394910f42024154b01980b216266ea9/0_l_0-1\", \"b394910f42024154b01980b216266ea9/0_l_1-0\", \"b394910f42024154b01980b216266ea9/0_l_1-1\", \"b394910f42024154b01980b216266ea9/0_r_0-0\", \"b394910f42024154b01980b216266ea9/0_r_0-1\", \"b394910f42024154b01980b216266ea9/0_r_1-0\", \"b394910f42024154b01980b216266ea9/0_r_1-1\", \"b394910f42024154b01980b216266ea9/0_t_0-0\", \"b394910f42024154b01980b216266ea9/0_t_0-1\", \"b394910f42024154b01980b216266ea9/0_t_1-0\", \"b394910f42024154b01980b216266ea9/0_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "store_id": 31671,
+        "origin_id": 1333524,
+        "coordinate": {
+          "id": 1333492,
+          "panorama_id": 1333524,
+          "direction_w": -0.25639392833965585,
+          "direction_x": 0.2593555434775284,
+          "direction_y": 0.6667309250569762,
+          "direction_z": -0.6499744065351375,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": 0.04013181342146416,
+          "position_y": -0.010043481644069506,
+          "position_z": 0.7220415647527223
+        }
+      },
+      {
+        "id": 1333526,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/1_b_low\"]",
+        "seq_id": 1,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/1_b_0-0\", \"b394910f42024154b01980b216266ea9/1_b_0-1\", \"b394910f42024154b01980b216266ea9/1_b_1-0\", \"b394910f42024154b01980b216266ea9/1_b_1-1\", \"b394910f42024154b01980b216266ea9/1_d_0-0\", \"b394910f42024154b01980b216266ea9/1_d_0-1\", \"b394910f42024154b01980b216266ea9/1_d_1-0\", \"b394910f42024154b01980b216266ea9/1_d_1-1\", \"b394910f42024154b01980b216266ea9/1_f_0-0\", \"b394910f42024154b01980b216266ea9/1_f_0-1\", \"b394910f42024154b01980b216266ea9/1_f_1-0\", \"b394910f42024154b01980b216266ea9/1_f_1-1\", \"b394910f42024154b01980b216266ea9/1_l_0-0\", \"b394910f42024154b01980b216266ea9/1_l_0-1\", \"b394910f42024154b01980b216266ea9/1_l_1-0\", \"b394910f42024154b01980b216266ea9/1_l_1-1\", \"b394910f42024154b01980b216266ea9/1_r_0-0\", \"b394910f42024154b01980b216266ea9/1_r_0-1\", \"b394910f42024154b01980b216266ea9/1_r_1-0\", \"b394910f42024154b01980b216266ea9/1_r_1-1\", \"b394910f42024154b01980b216266ea9/1_t_0-0\", \"b394910f42024154b01980b216266ea9/1_t_0-1\", \"b394910f42024154b01980b216266ea9/1_t_1-0\", \"b394910f42024154b01980b216266ea9/1_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "store_id": 31671,
+        "origin_id": 1333526,
+        "coordinate": {
+          "id": 1333494,
+          "panorama_id": 1333526,
+          "direction_w": -0.26130535616036543,
+          "direction_x": 0.2633878564216925,
+          "direction_y": 0.6643957136635601,
+          "direction_z": -0.6487870864906137,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -3.052824764769259,
+          "position_y": -0.2090759764257057,
+          "position_z": 0.7223641060969277
+        }
+      },
+      {
+        "id": 1333528,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/2_b_low\"]",
+        "seq_id": 2,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/2_b_0-0\", \"b394910f42024154b01980b216266ea9/2_b_0-1\", \"b394910f42024154b01980b216266ea9/2_b_1-0\", \"b394910f42024154b01980b216266ea9/2_b_1-1\", \"b394910f42024154b01980b216266ea9/2_d_0-0\", \"b394910f42024154b01980b216266ea9/2_d_0-1\", \"b394910f42024154b01980b216266ea9/2_d_1-0\", \"b394910f42024154b01980b216266ea9/2_d_1-1\", \"b394910f42024154b01980b216266ea9/2_f_0-0\", \"b394910f42024154b01980b216266ea9/2_f_0-1\", \"b394910f42024154b01980b216266ea9/2_f_1-0\", \"b394910f42024154b01980b216266ea9/2_f_1-1\", \"b394910f42024154b01980b216266ea9/2_l_0-0\", \"b394910f42024154b01980b216266ea9/2_l_0-1\", \"b394910f42024154b01980b216266ea9/2_l_1-0\", \"b394910f42024154b01980b216266ea9/2_l_1-1\", \"b394910f42024154b01980b216266ea9/2_r_0-0\", \"b394910f42024154b01980b216266ea9/2_r_0-1\", \"b394910f42024154b01980b216266ea9/2_r_1-0\", \"b394910f42024154b01980b216266ea9/2_r_1-1\", \"b394910f42024154b01980b216266ea9/2_t_0-0\", \"b394910f42024154b01980b216266ea9/2_t_0-1\", \"b394910f42024154b01980b216266ea9/2_t_1-0\", \"b394910f42024154b01980b216266ea9/2_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          2,
+          3,
+          4,
+          6
+        ],
+        "store_id": 31671,
+        "origin_id": 1333528,
+        "coordinate": {
+          "id": 1333496,
+          "panorama_id": 1333528,
+          "direction_w": -0.24761544323905907,
+          "direction_x": 0.25171076201655257,
+          "direction_y": 0.6689423319126435,
+          "direction_z": -0.6540981892115627,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -5.9326445045324725,
+          "position_y": -0.2637700023140539,
+          "position_z": 0.7304820208052184
+        }
+      },
+      {
+        "id": 1333529,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/3_b_low\"]",
+        "seq_id": 3,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/3_b_0-0\", \"b394910f42024154b01980b216266ea9/3_b_0-1\", \"b394910f42024154b01980b216266ea9/3_b_1-0\", \"b394910f42024154b01980b216266ea9/3_b_1-1\", \"b394910f42024154b01980b216266ea9/3_d_0-0\", \"b394910f42024154b01980b216266ea9/3_d_0-1\", \"b394910f42024154b01980b216266ea9/3_d_1-0\", \"b394910f42024154b01980b216266ea9/3_d_1-1\", \"b394910f42024154b01980b216266ea9/3_f_0-0\", \"b394910f42024154b01980b216266ea9/3_f_0-1\", \"b394910f42024154b01980b216266ea9/3_f_1-0\", \"b394910f42024154b01980b216266ea9/3_f_1-1\", \"b394910f42024154b01980b216266ea9/3_l_0-0\", \"b394910f42024154b01980b216266ea9/3_l_0-1\", \"b394910f42024154b01980b216266ea9/3_l_1-0\", \"b394910f42024154b01980b216266ea9/3_l_1-1\", \"b394910f42024154b01980b216266ea9/3_r_0-0\", \"b394910f42024154b01980b216266ea9/3_r_0-1\", \"b394910f42024154b01980b216266ea9/3_r_1-0\", \"b394910f42024154b01980b216266ea9/3_r_1-1\", \"b394910f42024154b01980b216266ea9/3_t_0-0\", \"b394910f42024154b01980b216266ea9/3_t_0-1\", \"b394910f42024154b01980b216266ea9/3_t_1-0\", \"b394910f42024154b01980b216266ea9/3_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "store_id": 31671,
+        "origin_id": 1333529,
+        "coordinate": {
+          "id": 1333497,
+          "panorama_id": 1333529,
+          "direction_w": -0.6371402272733376,
+          "direction_x": 0.6492681646894614,
+          "direction_y": 0.29863593671791333,
+          "direction_z": -0.2886516211828241,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -6.156488431578866,
+          "position_y": 1.3205594991540432,
+          "position_z": 0.7145974095332613
+        }
+      },
+      {
+        "id": 1333531,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/4_b_low\"]",
+        "seq_id": 4,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/4_b_0-0\", \"b394910f42024154b01980b216266ea9/4_b_0-1\", \"b394910f42024154b01980b216266ea9/4_b_1-0\", \"b394910f42024154b01980b216266ea9/4_b_1-1\", \"b394910f42024154b01980b216266ea9/4_d_0-0\", \"b394910f42024154b01980b216266ea9/4_d_0-1\", \"b394910f42024154b01980b216266ea9/4_d_1-0\", \"b394910f42024154b01980b216266ea9/4_d_1-1\", \"b394910f42024154b01980b216266ea9/4_f_0-0\", \"b394910f42024154b01980b216266ea9/4_f_0-1\", \"b394910f42024154b01980b216266ea9/4_f_1-0\", \"b394910f42024154b01980b216266ea9/4_f_1-1\", \"b394910f42024154b01980b216266ea9/4_l_0-0\", \"b394910f42024154b01980b216266ea9/4_l_0-1\", \"b394910f42024154b01980b216266ea9/4_l_1-0\", \"b394910f42024154b01980b216266ea9/4_l_1-1\", \"b394910f42024154b01980b216266ea9/4_r_0-0\", \"b394910f42024154b01980b216266ea9/4_r_0-1\", \"b394910f42024154b01980b216266ea9/4_r_1-0\", \"b394910f42024154b01980b216266ea9/4_r_1-1\", \"b394910f42024154b01980b216266ea9/4_t_0-0\", \"b394910f42024154b01980b216266ea9/4_t_0-1\", \"b394910f42024154b01980b216266ea9/4_t_1-0\", \"b394910f42024154b01980b216266ea9/4_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "store_id": 31671,
+        "origin_id": 1333531,
+        "coordinate": {
+          "id": 1333499,
+          "panorama_id": 1333531,
+          "direction_w": -0.6549670119541381,
+          "direction_x": 0.6689989879519576,
+          "direction_y": -0.24900804788376693,
+          "direction_z": 0.24789828450443208,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -5.7345728517358365,
+          "position_y": 2.1805513420196605,
+          "position_z": 0.7101742786928076
+        }
+      },
+      {
+        "id": 1333533,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/5_b_low\"]",
+        "seq_id": 5,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/5_b_0-0\", \"b394910f42024154b01980b216266ea9/5_b_0-1\", \"b394910f42024154b01980b216266ea9/5_b_1-0\", \"b394910f42024154b01980b216266ea9/5_b_1-1\", \"b394910f42024154b01980b216266ea9/5_d_0-0\", \"b394910f42024154b01980b216266ea9/5_d_0-1\", \"b394910f42024154b01980b216266ea9/5_d_1-0\", \"b394910f42024154b01980b216266ea9/5_d_1-1\", \"b394910f42024154b01980b216266ea9/5_f_0-0\", \"b394910f42024154b01980b216266ea9/5_f_0-1\", \"b394910f42024154b01980b216266ea9/5_f_1-0\", \"b394910f42024154b01980b216266ea9/5_f_1-1\", \"b394910f42024154b01980b216266ea9/5_l_0-0\", \"b394910f42024154b01980b216266ea9/5_l_0-1\", \"b394910f42024154b01980b216266ea9/5_l_1-0\", \"b394910f42024154b01980b216266ea9/5_l_1-1\", \"b394910f42024154b01980b216266ea9/5_r_0-0\", \"b394910f42024154b01980b216266ea9/5_r_0-1\", \"b394910f42024154b01980b216266ea9/5_r_1-0\", \"b394910f42024154b01980b216266ea9/5_r_1-1\", \"b394910f42024154b01980b216266ea9/5_t_0-0\", \"b394910f42024154b01980b216266ea9/5_t_0-1\", \"b394910f42024154b01980b216266ea9/5_t_1-0\", \"b394910f42024154b01980b216266ea9/5_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "store_id": 31671,
+        "origin_id": 1333533,
+        "coordinate": {
+          "id": 1333501,
+          "panorama_id": 1333533,
+          "direction_w": 0.2856609487757431,
+          "direction_x": -0.29464773300422076,
+          "direction_y": 0.6509246000840746,
+          "direction_z": -0.6386530363079809,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -6.000673255760208,
+          "position_y": -1.8927538200475924,
+          "position_z": 0.7259720953018604
+        }
+      },
+      {
+        "id": 1333535,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_r\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_l\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_t\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_d\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_f\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_r_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_l_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_t_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_d_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_f_low\", \"https://robot-vr-public.cdn.bcebos.com/b394910f42024154b01980b216266ea9/6_b_low\"]",
+        "seq_id": 6,
+        "tile_images": "[\"b394910f42024154b01980b216266ea9/6_b_0-0\", \"b394910f42024154b01980b216266ea9/6_b_0-1\", \"b394910f42024154b01980b216266ea9/6_b_1-0\", \"b394910f42024154b01980b216266ea9/6_b_1-1\", \"b394910f42024154b01980b216266ea9/6_d_0-0\", \"b394910f42024154b01980b216266ea9/6_d_0-1\", \"b394910f42024154b01980b216266ea9/6_d_1-0\", \"b394910f42024154b01980b216266ea9/6_d_1-1\", \"b394910f42024154b01980b216266ea9/6_f_0-0\", \"b394910f42024154b01980b216266ea9/6_f_0-1\", \"b394910f42024154b01980b216266ea9/6_f_1-0\", \"b394910f42024154b01980b216266ea9/6_f_1-1\", \"b394910f42024154b01980b216266ea9/6_l_0-0\", \"b394910f42024154b01980b216266ea9/6_l_0-1\", \"b394910f42024154b01980b216266ea9/6_l_1-0\", \"b394910f42024154b01980b216266ea9/6_l_1-1\", \"b394910f42024154b01980b216266ea9/6_r_0-0\", \"b394910f42024154b01980b216266ea9/6_r_0-1\", \"b394910f42024154b01980b216266ea9/6_r_1-0\", \"b394910f42024154b01980b216266ea9/6_r_1-1\", \"b394910f42024154b01980b216266ea9/6_t_0-0\", \"b394910f42024154b01980b216266ea9/6_t_0-1\", \"b394910f42024154b01980b216266ea9/6_t_1-0\", \"b394910f42024154b01980b216266ea9/6_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "store_id": 31671,
+        "origin_id": 1333535,
+        "coordinate": {
+          "id": 1333503,
+          "panorama_id": 1333535,
+          "direction_w": -0.6619383757012964,
+          "direction_x": 0.6763975470459879,
+          "direction_y": -0.22938348273409254,
+          "direction_z": 0.22739209083184503,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -5.513796943618311,
+          "position_y": -2.810927208454419,
+          "position_z": 0.717759127325649
+        }
+      }
+    ]
+  }
+}

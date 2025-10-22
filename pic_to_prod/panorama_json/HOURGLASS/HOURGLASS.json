@@ -1,0 +1,218 @@
+{
+  "request_id": "bb9f120d-0a1b-46ba-a090-c03fb21bb085",
+  "error_no": 200,
+  "error_msg": "success",
+  "data": {
+    "cursor_icon": "",
+    "description": "https://robot-vr-public.cdn.bcebos.com/process_log/69788af9a58d450494dad1f064d6c4c6.log",
+    "desktop_loading_picture": "",
+    "floor_nb": "-1",
+    "floor_plan_picture": "",
+    "id": 31650,
+    "location_nb": "-1",
+    "logo": "",
+    "mall_id": 1,
+    "modelPath": "https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/model",
+    "texture_path": "",
+    "panorama_icon_id": 0,
+    "phone_loading_picture": "",
+    "picture_selections": "[]",
+    "preview_img": "https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_f_low",
+    "source": 0,
+    "store_name": "郑州正弘城：L1HOURGLASS-子图2-郑州正弘城：L1HOURGLASS",
+    "visit_nb": 0,
+    "ground_expression": [],
+    "initial_view": {
+      "id": 18103,
+      "roaming_direction_x": 1.0,
+      "roaming_direction_y": 0.0,
+      "roaming_direction_z": 0.0,
+      "roaming_panorama_id": 1332501,
+      "store_id": 31650,
+      "three_d_direction_x": 0,
+      "three_d_direction_y": 0,
+      "three_d_direction_z": 0,
+      "three_d_panorama_id": 0
+    },
+    "panorama_list": [
+      {
+        "id": 1332501,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/0_b_low\"]",
+        "seq_id": 0,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/0_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/0_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/0_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/0_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/0_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/0_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/0_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/0_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/0_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "store_id": 31650,
+        "origin_id": 1332501,
+        "coordinate": {
+          "id": 1332469,
+          "panorama_id": 1332501,
+          "direction_w": -0.2552930346647003,
+          "direction_x": 0.26152781991881363,
+          "direction_y": 0.6666618453166706,
+          "direction_z": -0.6496080740409345,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": 0.040585213085115125,
+          "position_y": 0.028830078885432438,
+          "position_z": 0.7295374672430555
+        }
+      },
+      {
+        "id": 1332502,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/1_b_low\"]",
+        "seq_id": 1,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/1_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/1_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/1_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/1_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/1_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/1_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/1_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/1_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/1_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          4,
+          5
+        ],
+        "store_id": 31650,
+        "origin_id": 1332502,
+        "coordinate": {
+          "id": 1332470,
+          "panorama_id": 1332502,
+          "direction_w": -0.27506836838182214,
+          "direction_x": 0.28003911843323526,
+          "direction_y": 0.6577328111143155,
+          "direction_z": -0.642886486128429,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -2.574346516817304,
+          "position_y": 0.2803187927133394,
+          "position_z": 0.7344672623603119
+        }
+      },
+      {
+        "id": 1332503,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/2_b_low\"]",
+        "seq_id": 2,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/2_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/2_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/2_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/2_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/2_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/2_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/2_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/2_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/2_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "store_id": 31650,
+        "origin_id": 1332503,
+        "coordinate": {
+          "id": 1332471,
+          "panorama_id": 1332503,
+          "direction_w": -0.11657178050248586,
+          "direction_x": 0.11997451309616644,
+          "direction_y": 0.7059232692232886,
+          "direction_z": -0.6882510255473087,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -5.0818332988183625,
+          "position_y": -1.2028020408072313,
+          "position_z": 0.7337391142881335
+        }
+      },
+      {
+        "id": 1332504,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/3_b_low\"]",
+        "seq_id": 3,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/3_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/3_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/3_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/3_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/3_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/3_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/3_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/3_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/3_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          2,
+          3,
+          4
+        ],
+        "store_id": 31650,
+        "origin_id": 1332504,
+        "coordinate": {
+          "id": 1332472,
+          "panorama_id": 1332504,
+          "direction_w": -0.4982766020925029,
+          "direction_x": 0.5080297535316637,
+          "direction_y": 0.5042071728971654,
+          "direction_z": -0.4892865460369357,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -7.590026318474922,
+          "position_y": -0.6012718433405355,
+          "position_z": 0.7384360597509186
+        }
+      },
+      {
+        "id": 1332505,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/4_b_low\"]",
+        "seq_id": 4,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/4_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/4_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/4_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/4_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/4_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/4_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/4_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/4_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/4_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          3,
+          4,
+          5
+        ],
+        "store_id": 31650,
+        "origin_id": 1332505,
+        "coordinate": {
+          "id": 1332473,
+          "panorama_id": 1332505,
+          "direction_w": -0.6988928008556881,
+          "direction_x": 0.7151811261652888,
+          "direction_y": 0.006428418145585471,
+          "direction_z": -0.004846145807379745,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -7.470999536346095,
+          "position_y": 1.584273085696713,
+          "position_z": 0.7354115753943352
+        }
+      },
+      {
+        "id": 1332506,
+        "panorama_images": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_r\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_l\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_t\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_d\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_f\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_b\"]",
+        "panorama_images_low": "[\"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_r_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_l_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_t_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_d_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_f_low\", \"https://robot-vr-public.cdn.bcebos.com/69788af9a58d450494dad1f064d6c4c6/5_b_low\"]",
+        "seq_id": 5,
+        "tile_images": "[\"69788af9a58d450494dad1f064d6c4c6/5_b_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_b_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_b_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_b_1-1\", \"69788af9a58d450494dad1f064d6c4c6/5_d_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_d_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_d_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_d_1-1\", \"69788af9a58d450494dad1f064d6c4c6/5_f_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_f_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_f_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_f_1-1\", \"69788af9a58d450494dad1f064d6c4c6/5_l_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_l_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_l_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_l_1-1\", \"69788af9a58d450494dad1f064d6c4c6/5_r_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_r_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_r_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_r_1-1\", \"69788af9a58d450494dad1f064d6c4c6/5_t_0-0\", \"69788af9a58d450494dad1f064d6c4c6/5_t_0-1\", \"69788af9a58d450494dad1f064d6c4c6/5_t_1-0\", \"69788af9a58d450494dad1f064d6c4c6/5_t_1-1\"]",
+        "visible": true,
+        "visible_panorama_seq_ids": [
+          0,
+          1,
+          4,
+          5
+        ],
+        "store_id": 31650,
+        "origin_id": 1332506,
+        "coordinate": {
+          "id": 1332474,
+          "panorama_id": 1332506,
+          "direction_w": -0.5198757616574085,
+          "direction_x": 0.534117451871249,
+          "direction_y": -0.4769009994035433,
+          "direction_z": 0.46584673103457014,
+          "position_u": 0,
+          "position_v": 0,
+          "position_x": -5.205575113452399,
+          "position_y": 1.9377090313802767,
+          "position_z": 0.7386461797533549
+        }
+      }
+    ]
+  }
+}
