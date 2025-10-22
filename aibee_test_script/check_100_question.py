@@ -139,7 +139,7 @@ def check_100_question(place_id, question, env):
         ws = wb.active
         ws.title = "Sheet1"
         # 扩展表头，加入计时字段
-        ws.append(fieldnames + ["ttft_ms", "tlat_ms"])
+        ws.append(fieldnames + ["first_token_s", "total_token_s"])
         wb.save(excel_filename)
     total_iters = len(questions) * max(1, len(intentions))
     done_iters = 0
@@ -211,14 +211,15 @@ def check_100_question(place_id, question, env):
                         sendResult += json.dumps(data, ensure_ascii=False)
             except json.JSONDecodeError as e:
                 print("JSON 解析失败:", e)
-            ttft_ms = int((first_token_time - start_time) * 1000) if first_token_time else None
-            tlat_ms = int((end_time - start_time) * 1000)
+            # 改为秒，保留两位小数
+            first_token_s = round((first_token_time - start_time), 2) if first_token_time else None
+            total_token_s = round((end_time - start_time), 2)
             resDict = {
                 "text": s,
                 "old_intention": old_intention,
                 "result": sendResult,
-                "ttft_ms": ttft_ms,
-                "tlat_ms": tlat_ms,
+                "first_token_s": first_token_s,
+                "total_token_s": total_token_s,
             }
             print(resDict)
             final_result.append(resDict)
@@ -227,7 +228,7 @@ def check_100_question(place_id, question, env):
                 wb = load_workbook(excel_filename)
                 ws = wb.active
                 # 与表头顺序对应写入
-                ws.append([resDict["text"], resDict["old_intention"], resDict["result"], resDict["ttft_ms"], resDict["tlat_ms"]])
+                ws.append([resDict["text"], resDict["old_intention"], resDict["result"], resDict["first_token_s"], resDict["total_token_s"]])
                 wb.save(excel_filename)
             except Exception as e:
                 print(f"写入 Excel 失败: {e}")
