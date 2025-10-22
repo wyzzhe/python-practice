@@ -21,7 +21,6 @@ THREADS = 16
 TIMEOUT = 15
 CHUNK = 1024 * 64
 
-
 # ----------------- 工具函数 -----------------
 def extract_images_with_source(json_file: str):
     """从单个 json 文件里提取所有 panorama_images 链接，并记录来源文件"""
