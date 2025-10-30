@@ -16,7 +16,7 @@ from tqdm import tqdm
 from urllib.parse import urlparse
 import re
 
-DEFAULT_JSON_DIR = 'C:\\Users\\wyz\\Desktop\\dev-2025\\python-practice\\pic_to_prod\\panorama_json'
+DEFAULT_JSON_DIR = 'C:\\Users\\wyz\\Desktop\\dev-2025\\python-practice\\vr_pic_to_prod\\panorama_json'
 THREADS = 16
 TIMEOUT = 15
 CHUNK = 1024 * 64
