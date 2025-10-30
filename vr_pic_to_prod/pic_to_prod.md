@@ -1,3 +1,5 @@
+uv run .\vr_pic_to_prod\03_vrpic_to_prod.py --brand_list --vr_loc_list
+
 以下是按照业态对郑州正弘城的店铺进行分类后的结果：
 一、美妆护肤类
 高端美妆护肤

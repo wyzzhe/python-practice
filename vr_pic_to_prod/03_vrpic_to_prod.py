@@ -12,8 +12,8 @@ import base64
 import argparse
 import math
 from typing import List, Dict, Optional
-import requests
 from tqdm import tqdm
+from openai import OpenAI
 
 # 导入提示词
 from prompt import vr_pic_prompt
@@ -29,15 +29,20 @@ DEFAULT_PANORAMA_DIR = os.path.join(
 
 # 豆包 API 配置（需要配置环境变量）
 DOUBAO_API_KEY = os.getenv('DOUBAO_API_KEY', '')
-DOUBAO_ENDPOINT = os.getenv(
-    'DOUBAO_ENDPOINT', 
-    'https://ark.cn-beijing.volces.com/api/v3/chat/completions'
+DOUBAO_BASE_URL = os.getenv(
+    'DOUBAO_BASE_URL', 
+    'https://ark.cn-beijing.volces.com/api/v3'
 )
-DOUBAO_MODEL = 'Doubao-Seed-1.6-vision'
+# 豆包模型名称 - 需要使用正确的模型名称
+# 常见的豆包视觉模型名称（请根据实际情况调整）：
+# - doubao-seed-1-6-250615 (参考代码中的模型)
+# - doubao-vision-pro (可能的视觉模型)
+# - ep-xxxxx (也可能是 endpoint ID)
+DOUBAO_MODEL = os.getenv('DOUBAO_MODEL', 'doubao-seed-1-6-vision-250815')
 
 # 并发配置
 MAX_WORKERS = 3  # 视觉模型较慢，建议设置较小的并发数
-TIMEOUT = 60  # API 超时时间（秒）
+TIMEOUT = 1200  # API 超时时间（秒），传入多张图片需要更长时间
 
 
 # ==================== 工具函数 ====================
@@ -263,17 +268,17 @@ def call_doubao_vision_api(
     image_paths: List[str], 
     prompt: str,
     api_key: str,
-    endpoint: str,
+    base_url: str,
     seq_id: int
 ) -> Optional[Dict]:
     """
-    调用豆包视觉模型 API
+    调用豆包视觉模型 API（使用 OpenAI SDK）
     
     Args:
         image_paths: 图片路径列表（一个全景位置的多个方向）
         prompt: 提示词
         api_key: API 密钥
-        endpoint: API 端点
+        base_url: API 基础 URL
         seq_id: VR 点位编号
     
     Returns:
@@ -309,11 +314,15 @@ def call_doubao_vision_api(
     
     print(f'[DEBUG] 点位 {seq_id}: 找到 {len(encoded_images)} 个方向的图片：{[img["direction"] for img in encoded_images]}')
     
-    # 构建请求
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {api_key}'
-    }
+    # 计算总的图片大小（用于调试）
+    total_size = sum(len(img['base64']) for img in encoded_images)
+    print(f'[DEBUG] 点位 {seq_id}: Base64 总大小约 {total_size / 1024 / 1024:.2f} MB')
+    
+    # 初始化 OpenAI 客户端（兼容豆包 API）
+    client = OpenAI(
+        api_key=api_key,
+        base_url=base_url
+    )
     
     # 在提示词中加入点位编号和方向信息
     full_prompt = f"【当前 VR 点位编号：{seq_id}】\n"
@@ -341,65 +350,77 @@ def call_doubao_vision_api(
         'text': full_prompt
     })
     
-    payload = {
-        'model': DOUBAO_MODEL,
-        'messages': [
-            {
-                'role': 'user',
-                'content': content
-            }
-        ],
-        'temperature': 0.7,
-        'max_tokens': 4096
-    }
-    
     try:
-        response = requests.post(
-            endpoint,
-            headers=headers,
-            json=payload,
+        print(f'[DEBUG] 正在发送请求到: {base_url}')
+        print(f'[DEBUG] 使用模型: {DOUBAO_MODEL}')
+        print(f'[DEBUG] 请求包含 {len(encoded_images)} 张图片')
+        
+        # 使用 OpenAI SDK 调用（兼容豆包 API）
+        response = client.chat.completions.create(
+            model=DOUBAO_MODEL,
+            messages=[
+                {
+                    'role': 'user',
+                    'content': content
+                }
+            ],
+            temperature=0.7,
+            max_tokens=4096,
             timeout=TIMEOUT
         )
-        response.raise_for_status()
         
-        result = response.json()
+        print(f'[DEBUG] 收到响应，消耗 tokens: {response.usage.total_tokens if hasattr(response, "usage") else "未知"}')
         
         # 解析返回内容
-        if 'choices' in result and len(result['choices']) > 0:
-            content = result['choices'][0]['message']['content']
+        if response.choices and len(response.choices) > 0:
+            response_content = response.choices[0].message.content
             
             # 尝试解析为 JSON
             try:
                 # 清理可能的 markdown 代码块标记
-                content = content.strip()
-                if content.startswith('```json'):
-                    content = content[7:]
-                if content.startswith('```'):
-                    content = content[3:]
-                if content.endswith('```'):
-                    content = content[:-3]
-                content = content.strip()
+                response_content = response_content.strip()
+                if response_content.startswith('```json'):
+                    response_content = response_content[7:]
+                if response_content.startswith('```'):
+                    response_content = response_content[3:]
+                if response_content.endswith('```'):
+                    response_content = response_content[:-3]
+                response_content = response_content.strip()
                 
-                return json.loads(content)
+                return json.loads(response_content)
             except json.JSONDecodeError as e:
                 print(f'[WARN] JSON 解析失败: {e}')
-                print(f'原始内容: {content[:200]}...')
-                return {'raw_content': content, 'parse_error': str(e)}
+                print(f'原始内容: {response_content[:200]}...')
+                return {'raw_content': response_content, 'parse_error': str(e)}
         
         return None
         
-    except requests.exceptions.RequestException as e:
-        print(f'[ERROR] API 请求失败: {e}')
-        return None
     except Exception as e:
-        print(f'[ERROR] 处理响应失败: {e}')
+        error_msg = str(e)
+        print(f'[ERROR] API 调用失败: {error_msg}')
+        print(f'[调试信息] Base URL: {base_url}')
+        print(f'[调试信息] Model: {DOUBAO_MODEL}')
+        print(f'[调试信息] 图片数量: {len(encoded_images)}')
+        print(f'[调试信息] 请求大小: {total_size / 1024 / 1024:.2f} MB')
+        
+        # 提供可能的解决方案
+        if '404' in error_msg:
+            print('[提示] 404 错误可能原因：')
+            print('  1. 模型名称不正确，请检查 DOUBAO_MODEL 配置')
+            print('  2. Base URL 不正确，当前: {}'.format(base_url))
+            print('  3. 该模型可能不支持视觉功能')
+        elif 'timeout' in error_msg.lower():
+            print(f'[提示] 请求超时（{TIMEOUT}秒），传入了 {len(encoded_images)} 张图片')
+        
+        import traceback
+        traceback.print_exc()
         return None
 
 
 def process_brand(
     brand_folder: str,
     api_key: str,
-    endpoint: str,
+    base_url: str,
     prompt: str,
     vr_loc_list: Optional[List[int]] = None
 ) -> Dict:
@@ -409,7 +430,7 @@ def process_brand(
     Args:
         brand_folder: 品牌文件夹路径
         api_key: API 密钥
-        endpoint: API 端点
+        base_url: API 基础 URL
         prompt: 提示词
         vr_loc_list: VR 点位筛选列表，None 表示处理全部点位
     
@@ -478,7 +499,7 @@ def process_brand(
             image_paths,
             prompt,
             api_key,
-            endpoint,
+            base_url,
             seq_id
         )
         
@@ -561,7 +582,7 @@ def main():
     parser.add_argument(
         '--output_dir',
         type=str,
-        default='./analysis_results',
+        default='C:\\Users\\wyz\\Desktop\\dev-2025\\python-practice\\vr_pic_to_prod\\analysis_results',
         help='分析结果输出目录'
     )
     parser.add_argument(
@@ -571,10 +592,10 @@ def main():
         help='豆包 API 密钥（可通过环境变量 DOUBAO_API_KEY 设置）'
     )
     parser.add_argument(
-        '--endpoint',
+        '--base_url',
         type=str,
-        default=DOUBAO_ENDPOINT,
-        help='豆包 API 端点'
+        default=DOUBAO_BASE_URL,
+        help='豆包 API 基础 URL'
     )
     
     args = parser.parse_args()
@@ -618,7 +639,7 @@ def main():
     
     print(f'[INFO] 共找到 {len(brand_folders)} 个品牌待处理')
     print(f'[INFO] 使用模型: {DOUBAO_MODEL}')
-    print(f'[INFO] API 端点: {args.endpoint}')
+    print(f'[INFO] API 基础 URL: {args.base_url}')
     print(f'[INFO] 结果输出目录: {args.output_dir}\n')
     
     # 创建输出目录
@@ -631,7 +652,7 @@ def main():
             result = process_brand(
                 brand_folder,
                 args.api_key,
-                args.endpoint,
+                args.base_url,
                 vr_pic_prompt,
                 vr_filter
             )
