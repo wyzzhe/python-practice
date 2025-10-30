@@ -16,7 +16,7 @@ from tqdm import tqdm
 from openai import OpenAI
 
 # 导入提示词
-from prompt import vr_pic_prompt
+from prompt import vr_product_prompt, vr_store_prompt
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -42,7 +42,7 @@ DOUBAO_MODEL = os.getenv('DOUBAO_MODEL', 'doubao-seed-1-6-vision-250815')
 
 # 并发配置
 MAX_WORKERS = 3  # 视觉模型较慢，建议设置较小的并发数
-TIMEOUT = 1200  # API 超时时间（秒），传入多张图片需要更长时间
+TIMEOUT = 10000  # API 超时时间（秒），传入多张图片需要更长时间
 
 
 # ==================== 工具函数 ====================
@@ -54,7 +54,7 @@ def load_panorama_coordinates(brand_folder: str) -> Dict[int, Dict]:
         brand_folder: 品牌文件夹路径
     
     Returns:
-        {seq_id: {position_x, position_y, position_z, direction_x, ...}, ...}
+        {seq_id: {id, position_x, position_y, position_z, direction_x, ...}, ...}
     """
     brand_name = os.path.basename(brand_folder)
     json_file = os.path.join(brand_folder, f'{brand_name}.json')
@@ -72,10 +72,12 @@ def load_panorama_coordinates(brand_folder: str) -> Dict[int, Dict]:
         
         for pano in panorama_list:
             seq_id = pano.get('seq_id')
+            panorama_id = pano.get('id')  # 获取 panorama 的 id
             coord = pano.get('coordinate', {})
             
             if seq_id is not None and coord:
                 coordinates[seq_id] = {
+                    'id': panorama_id,  # 添加 panorama id
                     'position_x': coord.get('position_x', 0),
                     'position_y': coord.get('position_y', 0),
                     'position_z': coord.get('position_z', 0),
@@ -108,6 +110,58 @@ def get_direction_angle(direction: str) -> float:
         'l': 3 * math.pi / 2  # 左: 270度
     }
     return direction_map.get(direction, 0)
+
+
+def select_sample_points(all_seq_ids: List[int], max_points: Optional[int] = None) -> List[int]:
+    """
+    从所有点位中选择样本点，排除首尾各 总数/5 个点，从中间均匀分布选择
+    
+    Args:
+        all_seq_ids: 所有点位的 seq_id 列表（已排序）
+        max_points: 最大选择数量，None 表示不限制（选择所有中间点）
+    
+    Returns:
+        选中的 seq_id 列表
+    """
+    total_count = len(all_seq_ids)
+    
+    # 如果没有限制，或者点位数很少，进行首尾去除后全部选择
+    if max_points is None or total_count <= (max_points if max_points else 0):
+        # 即使不限制数量，也要去除首尾
+        if total_count <= 5:
+            # 点位数太少，全部返回
+            return all_seq_ids
+    
+    # 计算首尾各去除多少个点（总数 / 5，向下取整）
+    trim_count = total_count // 5
+    
+    # 确保去除后至少还有一些点可选
+    if trim_count * 2 >= total_count:
+        # 如果去除的太多，只去除首尾各1个
+        trim_count = 1
+    
+    # 去掉首尾，从中间选择
+    start_index = trim_count
+    end_index = total_count - trim_count
+    middle_points = all_seq_ids[start_index:end_index]
+    
+    print(f'[DEBUG] 总点位 {total_count} 个，去除首部 {trim_count} 个、尾部 {trim_count} 个，剩余 {len(middle_points)} 个')
+    
+    # 如果没有限制，返回所有中间点位
+    if max_points is None:
+        print(f'[DEBUG] 不限制点位数量，使用所有 {len(middle_points)} 个中间点位')
+        return middle_points
+    
+    if len(middle_points) <= max_points:
+        # 中间点位数不超过最大值，全部选择
+        return middle_points
+    
+    # 均匀分布选择
+    step = (len(middle_points) - 1) / (max_points - 1)
+    selected_indices = [int(round(i * step)) for i in range(max_points)]
+    selected_seq_ids = [middle_points[i] for i in selected_indices]
+    
+    return selected_seq_ids
 
 
 def calculate_product_3d_position(
@@ -269,7 +323,8 @@ def call_doubao_vision_api(
     prompt: str,
     api_key: str,
     base_url: str,
-    seq_id: int
+    seq_id: int,
+    panorama_id: int
 ) -> Optional[Dict]:
     """
     调用豆包视觉模型 API（使用 OpenAI SDK）
@@ -279,7 +334,8 @@ def call_doubao_vision_api(
         prompt: 提示词
         api_key: API 密钥
         base_url: API 基础 URL
-        seq_id: VR 点位编号
+        seq_id: VR 点位序列号（用于内部标识）
+        panorama_id: VR 点位 ID（JSON 中的 id 字段，传给模型）
     
     Returns:
         模型返回的 JSON 结果，失败返回 None
@@ -312,11 +368,11 @@ def call_doubao_vision_api(
         print('[WARN] 未找到有效图片')
         return None
     
-    print(f'[DEBUG] 点位 {seq_id}: 找到 {len(encoded_images)} 个方向的图片：{[img["direction"] for img in encoded_images]}')
+    print(f'[DEBUG] 点位 seq_id={seq_id}, panorama_id={panorama_id}: 找到 {len(encoded_images)} 个方向的图片：{[img["direction"] for img in encoded_images]}')
     
     # 计算总的图片大小（用于调试）
     total_size = sum(len(img['base64']) for img in encoded_images)
-    print(f'[DEBUG] 点位 {seq_id}: Base64 总大小约 {total_size / 1024 / 1024:.2f} MB')
+    print(f'[DEBUG] 点位 {panorama_id}: Base64 总大小约 {total_size / 1024 / 1024:.2f} MB')
     
     # 初始化 OpenAI 客户端（兼容豆包 API）
     client = OpenAI(
@@ -324,8 +380,8 @@ def call_doubao_vision_api(
         base_url=base_url
     )
     
-    # 在提示词中加入点位编号和方向信息
-    full_prompt = f"【当前 VR 点位编号：{seq_id}】\n"
+    # 在提示词中加入点位 ID 和方向信息（使用 panorama_id 而不是 seq_id）
+    full_prompt = f"【当前 VR 点位 ID：{panorama_id}】\n"
     full_prompt += f"【图片方向：共 {len(encoded_images)} 个视角，按顺序为 "
     full_prompt += "、".join([f"图{i+1}({img['direction']}-{'前' if img['direction']=='f' else '后' if img['direction']=='b' else '左' if img['direction']=='l' else '右'})" 
                               for i, img in enumerate(encoded_images)])
@@ -387,10 +443,45 @@ def call_doubao_vision_api(
                     response_content = response_content[:-3]
                 response_content = response_content.strip()
                 
-                return json.loads(response_content)
+                # 使用 JSONDecoder 的 raw_decode，它会忽略尾部额外数据
+                decoder = json.JSONDecoder()
+                try:
+                    result, index = decoder.raw_decode(response_content)
+                    
+                    # 检查是否有额外数据
+                    remaining = response_content[index:].strip()
+                    if remaining:
+                        print(f'[WARN] JSON 解析成功，但发现额外数据（已忽略）: {remaining[:100]}...')
+                    
+                    return result
+                except json.JSONDecodeError:
+                    # 如果 raw_decode 也失败，尝试标准 json.loads
+                    return json.loads(response_content)
+                    
             except json.JSONDecodeError as e:
-                print(f'[WARN] JSON 解析失败: {e}')
-                print(f'原始内容: {response_content[:200]}...')
+                print(f'[ERROR] JSON 解析失败: {e}')
+                
+                # 显示错误位置附近的内容
+                error_pos = e.pos if hasattr(e, 'pos') else 0
+                start = max(0, error_pos - 200)
+                end = min(len(response_content), error_pos + 200)
+                
+                print('错误位置附近的内容（前后各200字符）:')
+                print(f'...[{start}:{error_pos}]...')
+                print(response_content[start:error_pos])
+                print('>>> 错误位置 <<<')
+                print(response_content[error_pos:end])
+                print(f'...[{error_pos}:{end}]...')
+                
+                # 保存完整内容到文件以便调试
+                debug_file = f'debug_json_error_{seq_id}_{panorama_id}.txt'
+                try:
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_content)
+                    print(f'[DEBUG] 完整响应已保存到: {debug_file}')
+                except Exception:
+                    pass
+                
                 return {'raw_content': response_content, 'parse_error': str(e)}
         
         return None
@@ -417,12 +508,167 @@ def call_doubao_vision_api(
         return None
 
 
+def call_doubao_store_analysis_api(
+    all_point_images: List[Dict],
+    prompt: str,
+    api_key: str,
+    base_url: str,
+    brand_name: str
+) -> Optional[Dict]:
+    """
+    调用豆包 API 分析整个店铺环境（综合所有点位）
+    
+    Args:
+        all_point_images: 所有点位的图片列表 [{'seq_id': 0, 'images': [...]}, ...]
+        prompt: 提示词
+        api_key: API 密钥
+        base_url: API 基础 URL
+        brand_name: 品牌名称
+    
+    Returns:
+        模型返回的 JSON 结果，失败返回 None
+    """
+    if not api_key:
+        print('[ERROR] 未设置 DOUBAO_API_KEY 环境变量')
+        return None
+    
+    # 收集所有点位的图片（每个点位选择f方向）
+    # 这里的 all_point_images 已经是选择好的点位了（最多5个）
+    encoded_images = []
+    for point_data in all_point_images:
+        image_paths = point_data['images']
+        # 找到f方向的图片
+        for path in image_paths:
+            if path.endswith('_f.jpg'):
+                img_base64 = encode_image_to_base64(path)
+                if img_base64:
+                    encoded_images.append({
+                        'seq_id': point_data['seq_id'],
+                        'base64': img_base64
+                    })
+                break
+    
+    if not encoded_images:
+        print('[WARN] 未找到有效的店铺图片')
+        return None
+    
+    point_seq_ids = [img['seq_id'] for img in encoded_images]
+    print(f'[INFO] 店铺环境分析：收集了 {len(encoded_images)} 个点位的图片 {point_seq_ids}')
+    
+    # 初始化客户端
+    client = OpenAI(
+        api_key=api_key,
+        base_url=base_url
+    )
+    
+    # 构建提示词
+    full_prompt = f"【品牌名称：{brand_name}】\n"
+    full_prompt += f"【包含点位：{len(encoded_images)} 个VR点位】\n\n"
+    full_prompt += prompt
+    
+    # 构建内容数组
+    content = []
+    for img in encoded_images:
+        content.append({
+            'type': 'image_url',
+            'image_url': {
+                'url': f'data:image/jpeg;base64,{img["base64"]}'
+            }
+        })
+    
+    content.append({
+        'type': 'text',
+        'text': full_prompt
+    })
+    
+    try:
+        print('[DEBUG] 正在分析店铺环境...')
+        
+        response = client.chat.completions.create(
+            model=DOUBAO_MODEL,
+            messages=[
+                {
+                    'role': 'user',
+                    'content': content
+                }
+            ],
+            temperature=0.7,
+            max_tokens=4096,
+            timeout=TIMEOUT
+        )
+        
+        print('[DEBUG] 店铺分析完成')
+        
+        if response.choices and len(response.choices) > 0:
+            response_content = response.choices[0].message.content
+            
+            try:
+                response_content = response_content.strip()
+                
+                # 清理 markdown 代码块
+                if response_content.startswith('```json'):
+                    response_content = response_content[7:]
+                if response_content.startswith('```'):
+                    response_content = response_content[3:]
+                if response_content.endswith('```'):
+                    response_content = response_content[:-3]
+                response_content = response_content.strip()
+                
+                # 使用 JSONDecoder 的 raw_decode，它会忽略尾部额外数据
+                decoder = json.JSONDecoder()
+                try:
+                    result, index = decoder.raw_decode(response_content)
+                    
+                    # 检查是否有额外数据
+                    remaining = response_content[index:].strip()
+                    if remaining:
+                        print(f'[WARN] JSON 解析成功，但发现额外数据（已忽略）: {remaining[:100]}...')
+                    
+                    return result
+                except json.JSONDecodeError:
+                    # 如果 raw_decode 也失败，尝试标准 json.loads
+                    return json.loads(response_content)
+                    
+            except json.JSONDecodeError as e:
+                print(f'[ERROR] 店铺分析 JSON 解析失败: {e}')
+                
+                # 显示错误位置附近的内容
+                error_pos = e.pos if hasattr(e, 'pos') else 0
+                start = max(0, error_pos - 200)
+                end = min(len(response_content), error_pos + 200)
+                
+                print('错误位置附近的内容（前后各200字符）:')
+                print(f'...[{start}:{error_pos}]...')
+                print(response_content[start:error_pos])
+                print('>>> 错误位置 <<<')
+                print(response_content[error_pos:end])
+                print(f'...[{error_pos}:{end}]...')
+                
+                # 保存完整内容到文件以便调试
+                debug_file = f'debug_store_json_error_{brand_name}.txt'
+                try:
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_content)
+                    print(f'[DEBUG] 完整响应已保存到: {debug_file}')
+                except Exception:
+                    pass
+                
+                return {'raw_content': response_content, 'parse_error': str(e)}
+        
+        return None
+        
+    except Exception as e:
+        print(f'[ERROR] 店铺环境分析失败: {e}')
+        return None
+
+
 def process_brand(
     brand_folder: str,
     api_key: str,
     base_url: str,
-    prompt: str,
-    vr_loc_list: Optional[List[int]] = None
+    vr_loc_list: Optional[List[int]] = None,
+    max_product_points: Optional[int] = None,
+    max_store_points: int = 10
 ) -> Dict:
     """
     处理单个品牌的所有全景图片
@@ -431,21 +677,23 @@ def process_brand(
         brand_folder: 品牌文件夹路径
         api_key: API 密钥
         base_url: API 基础 URL
-        prompt: 提示词
         vr_loc_list: VR 点位筛选列表，None 表示处理全部点位
+        max_product_points: 商品分析最大点位数，None 表示不限制（默认）
+        max_store_points: 店铺分析最大点位数，默认 10 个
     
     Returns:
         {
             'brand': '品牌名',
-            'results': [
+            'product_results': [  # 各点位的商品数据
                 {
-                    'panorama_id': 'uuid_index',
-                    'seq_id': 点位编号,
+                    'panorama_id': 点位ID,
+                    'seq_id': 点位序列号,
                     'images': ['path1', 'path2', ...],
-                    'analysis': {...}  # 模型返回的分析结果
+                    'products': [...]  # 商品列表
                 },
                 ...
             ],
+            'store_analysis': {...},  # 整体店铺环境分析
             'success_count': 10,
             'fail_count': 2
         }
@@ -468,78 +716,127 @@ def process_brand(
             'fail_count': 0
         }
     
-    # 如果有点位筛选，计算实际要处理的点位数
-    if vr_loc_list is not None:
-        filtered_count = sum(1 for pg in panorama_groups.values() if pg['seq_id'] in vr_loc_list)
-        print(f'\n[INFO] 开始处理品牌: {brand_name}（共 {len(panorama_groups)} 个全景位置，筛选后 {filtered_count} 个）')
-    else:
-        print(f'\n[INFO] 开始处理品牌: {brand_name}（共 {len(panorama_groups)} 个全景位置）')
+    # 获取所有点位的 seq_id 并排序
+    all_seq_ids = sorted([pg['seq_id'] for pg in panorama_groups.values()])
     
-    results = []
+    # 应用 vr_loc_list 筛选（如果有）
+    if vr_loc_list is not None:
+        all_seq_ids = [sid for sid in all_seq_ids if sid in vr_loc_list]
+        print(f'\n[INFO] 应用 vr_loc_list 筛选后: {len(all_seq_ids)} 个点位')
+    
+    # 选择商品分析的样本点位（默认不限制）
+    product_seq_ids = select_sample_points(all_seq_ids, max_points=max_product_points)
+    
+    # 选择店铺分析的样本点位（默认10个）
+    store_seq_ids = select_sample_points(all_seq_ids, max_points=max_store_points)
+    
+    print(f'\n[INFO] 开始处理品牌: {brand_name}')
+    print(f'  - 总点位数: {len(panorama_groups)}')
+    if vr_loc_list is not None:
+        print(f'  - 筛选后: {len(all_seq_ids)} 个点位')
+    print(f'  - 商品分析点位: {len(product_seq_ids)} 个 {product_seq_ids}')
+    print(f'  - 店铺分析点位: {len(store_seq_ids)} 个 {store_seq_ids}')
+    
+    # ========== 第一阶段：按点位分析商品 ==========
+    print('[INFO] 第一阶段：分析各点位商品...')
+    
+    product_results = []
+    store_point_images = []  # 收集店铺分析的点位图片
     success_count = 0
     fail_count = 0
     
-    # 处理每个全景位置
-    for panorama_id, panorama_data in tqdm(panorama_groups.items(), desc=brand_name):
+    for panorama_key, panorama_data in tqdm(panorama_groups.items(), desc=f'{brand_name}-商品'):
         seq_id = panorama_data['seq_id']
         image_paths = panorama_data['images']
         
-        # 如果指定了点位列表，只处理列表中的点位
-        if vr_loc_list is not None and seq_id not in vr_loc_list:
+        # 只处理选中的商品分析点位
+        if seq_id not in product_seq_ids:
             continue
         
-        # 从图片路径中提取方向信息（使用 f 方向的图片）
-        direction = 'f'  # 默认使用前视图
-        for path in image_paths:
-            if '_f.jpg' in path:
-                direction = 'f'
-                break
+        # 获取 panorama_id
+        panorama_id_value = coordinates.get(seq_id, {}).get('id', seq_id)
         
+        # 调用商品分析 API（使用 vr_product_prompt）
         analysis = call_doubao_vision_api(
             image_paths,
-            prompt,
+            vr_product_prompt,  # 使用商品分析提示词
             api_key,
             base_url,
-            seq_id
+            seq_id,
+            panorama_id_value
         )
         
         if analysis:
-            # 为每个商品计算3D坐标
-            if 'products' in analysis and seq_id in coordinates:
+            # 检查是否有商品数据
+            products = analysis.get('products', [])
+            
+            # 只为推荐商品计算3D坐标
+            if products and seq_id in coordinates:
                 point_coord = coordinates[seq_id]
-                for product in analysis['products']:
-                    if 'bbox' in product and product['bbox']:
+                for product in products:
+                    # 只有推荐商品才计算坐标
+                    if product.get('is_recommended', False) and 'bbox' in product and product['bbox']:
                         try:
+                            # 使用模型返回的图片方向（而不是默认的'f'）
+                            product_direction = product.get('view_direction', 'f')
                             product_3d = calculate_product_3d_position(
                                 product['bbox'],
-                                direction,
+                                product_direction,  # 使用正确的方向
                                 point_coord
                             )
                             product['position_3d'] = product_3d
                         except Exception as e:
                             print(f'[WARN] 计算3D坐标失败: {e}')
                             product['position_3d'] = None
+                    else:
+                        # 非推荐商品不返回坐标
+                        product['position_3d'] = None
             
-            results.append({
-                'panorama_id': panorama_id,
-                'seq_id': seq_id,
-                'images': image_paths,
-                'analysis': analysis
-            })
-            success_count += 1
+            # 只保存有商品的点位
+            if products:
+                product_results.append({
+                    'panorama_id': panorama_id_value,
+                    'seq_id': seq_id,
+                    'images': image_paths,
+                    'products': products
+                })
+                success_count += 1
+            else:
+                print(f'[INFO] 点位 {seq_id} (ID:{panorama_id_value}) 未检测到商品，跳过')
         else:
-            results.append({
-                'panorama_id': panorama_id,
-                'seq_id': seq_id,
-                'images': image_paths,
-                'analysis': None,
-                'error': '分析失败'
-            })
+            print(f'[WARN] 点位 {seq_id} (ID:{panorama_id_value}) 分析失败，跳过')
             fail_count += 1
     
+    # ========== 第二阶段：分析整体店铺环境 ==========
+    print('\n[INFO] 第二阶段：分析店铺整体环境...')
+    
+    # 收集店铺分析需要的点位图片
+    for panorama_key, panorama_data in panorama_groups.items():
+        seq_id = panorama_data['seq_id']
+        image_paths = panorama_data['images']
+        
+        # 只收集店铺分析选中的点位
+        if seq_id in store_seq_ids:
+            store_point_images.append({
+                'seq_id': seq_id,
+                'images': image_paths
+            })
+    
+    store_analysis = None
+    if store_point_images:
+        store_analysis = call_doubao_store_analysis_api(
+            store_point_images,
+            vr_store_prompt,  # 使用店铺分析提示词
+            api_key,
+            base_url,
+            brand_name
+        )
+    
+    # ========== 合并结果 ==========
     return {
         'brand': brand_name,
-        'results': results,
+        'product_results': product_results,  # 各点位的商品数据
+        'store_analysis': store_analysis,    # 整体店铺环境分析
         'success_count': success_count,
         'fail_count': fail_count
     }
@@ -597,6 +894,18 @@ def main():
         default=DOUBAO_BASE_URL,
         help='豆包 API 基础 URL'
     )
+    parser.add_argument(
+        '--max_product_points',
+        type=int,
+        default=None,
+        help='商品分析最大点位数（默认不限制）'
+    )
+    parser.add_argument(
+        '--max_store_points',
+        type=int,
+        default=10,
+        help='店铺分析最大点位数（默认10个）'
+    )
     
     args = parser.parse_args()
     
@@ -653,8 +962,9 @@ def main():
                 brand_folder,
                 args.api_key,
                 args.base_url,
-                vr_pic_prompt,
-                vr_filter
+                vr_filter,
+                max_product_points=args.max_product_points,
+                max_store_points=args.max_store_points
             )
             
             # 保存结果

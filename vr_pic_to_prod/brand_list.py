@@ -1,9 +1,9 @@
 brand_list = [
     # 美妆护肤类
-    "HERMES",
+    # "HERMES",
     # "LANCOME",
     # # 时尚服饰类
-    # "PRADA", "MICHAELKORS",
+    "PRADA", "MICHAELKORS",
     # # 运动休闲类
     # "安踏", "耐克",
     # # 珠宝首饰类
