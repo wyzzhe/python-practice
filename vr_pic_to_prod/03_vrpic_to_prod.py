@@ -906,6 +906,11 @@ def main():
         default=10,
         help='店铺分析最大点位数（默认10个）'
     )
+    parser.add_argument(
+        '--force',
+        action='store_true',
+        help='强制重新分析已有结果的品牌'
+    )
     
     args = parser.parse_args()
     
@@ -957,6 +962,23 @@ def main():
     # 处理每个品牌
     all_results = []
     for brand_folder in brand_folders:
+        brand_name = os.path.basename(brand_folder)
+        output_file = os.path.join(args.output_dir, f'{brand_name}_analysis.json')
+        
+        # 检查是否已经有分析结果
+        if not args.force and os.path.exists(output_file):
+            print(f'[SKIP] {brand_name}: 已有分析结果，跳过（使用 --force 强制重新分析）')
+            
+            # 加载已有结果用于生成汇总报告
+            try:
+                with open(output_file, 'r', encoding='utf-8') as f:
+                    result = json.load(f)
+                    all_results.append(result)
+            except Exception as e:
+                print(f'[WARN] 无法读取已有结果 {output_file}: {e}')
+            
+            continue
+        
         try:
             result = process_brand(
                 brand_folder,
@@ -974,7 +996,7 @@ def main():
             print(f'[INFO] {result["brand"]}: 成功 {result["success_count"]}, 失败 {result["fail_count"]}')
             
         except Exception as e:
-            print(f'[ERROR] 处理品牌失败 {os.path.basename(brand_folder)}: {e}')
+            print(f'[ERROR] 处理品牌失败 {brand_name}: {e}')
             import traceback
             traceback.print_exc()
     
