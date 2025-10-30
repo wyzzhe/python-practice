@@ -17,7 +17,9 @@ from tqdm import tqdm
 
 # 导入提示词
 from prompt import vr_pic_prompt
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # ==================== 配置项 ====================
 DEFAULT_PANORAMA_DIR = os.path.join(
