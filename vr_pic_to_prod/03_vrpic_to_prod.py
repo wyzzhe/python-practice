@@ -10,6 +10,7 @@ import sys
 import json
 import base64
 import argparse
+import math
 from typing import List, Dict, Optional
 import requests
 from tqdm import tqdm
@@ -38,6 +39,129 @@ TIMEOUT = 60  # API 超时时间（秒）
 
 
 # ==================== 工具函数 ====================
+def load_panorama_coordinates(brand_folder: str) -> Dict[int, Dict]:
+    """
+    从品牌文件夹的 JSON 文件中加载所有点位的坐标信息
+    
+    Args:
+        brand_folder: 品牌文件夹路径
+    
+    Returns:
+        {seq_id: {position_x, position_y, position_z, direction_x, ...}, ...}
+    """
+    brand_name = os.path.basename(brand_folder)
+    json_file = os.path.join(brand_folder, f'{brand_name}.json')
+    
+    if not os.path.exists(json_file):
+        print(f'[WARN] JSON 文件不存在: {json_file}')
+        return {}
+    
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        coordinates = {}
+        panorama_list = data.get('data', {}).get('panorama_list', [])
+        
+        for pano in panorama_list:
+            seq_id = pano.get('seq_id')
+            coord = pano.get('coordinate', {})
+            
+            if seq_id is not None and coord:
+                coordinates[seq_id] = {
+                    'position_x': coord.get('position_x', 0),
+                    'position_y': coord.get('position_y', 0),
+                    'position_z': coord.get('position_z', 0),
+                    'direction_x': coord.get('direction_x', 0),
+                    'direction_y': coord.get('direction_y', 0),
+                    'direction_z': coord.get('direction_z', 0),
+                    'direction_w': coord.get('direction_w', 0)
+                }
+        
+        return coordinates
+    except Exception as e:
+        print(f'[ERROR] 读取坐标信息失败 {json_file}: {e}')
+        return {}
+
+
+def get_direction_angle(direction: str) -> float:
+    """
+    根据图片方向获取对应的角度（弧度）
+    
+    Args:
+        direction: f(前)/b(后)/l(左)/r(右)
+    
+    Returns:
+        角度（弧度）
+    """
+    direction_map = {
+        'f': 0,           # 前: 0度
+        'r': math.pi / 2, # 右: 90度
+        'b': math.pi,     # 后: 180度
+        'l': 3 * math.pi / 2  # 左: 270度
+    }
+    return direction_map.get(direction, 0)
+
+
+def calculate_product_3d_position(
+    bbox: Dict[str, float],
+    direction: str,
+    point_coord: Dict[str, float],
+    estimated_distance: float = 2.0
+) -> Dict[str, float]:
+    """
+    根据商品在图像中的边界框、拍摄方向和点位坐标，计算商品的3D坐标
+    
+    Args:
+        bbox: 边界框 {x_min, y_min, x_max, y_max}（归一化坐标）
+        direction: 图片方向 (f/b/l/r)
+        point_coord: 点位坐标 {position_x, position_y, position_z}
+        estimated_distance: 估算的商品距离（米），默认2米
+    
+    Returns:
+        {x, y, z}: 商品的3D坐标
+    """
+    # 计算商品在图像中的中心点
+    center_x = (bbox.get('x_min', 0) + bbox.get('x_max', 1)) / 2
+    center_y = (bbox.get('y_min', 0) + bbox.get('y_max', 1)) / 2
+    
+    # 将图像坐标转换为角度偏移
+    # center_x: 0.5 表示正中心，0 表示最左，1 表示最右
+    # 假设图像视野角度为90度（FOV）
+    fov_horizontal = math.pi / 2  # 90度视野
+    fov_vertical = math.pi / 2
+    
+    # 计算水平和垂直角度偏移
+    horizontal_offset = (center_x - 0.5) * fov_horizontal
+    vertical_offset = (center_y - 0.5) * fov_vertical
+    
+    # 获取基础方向角度
+    base_angle = get_direction_angle(direction)
+    
+    # 最终的水平角度
+    final_angle = base_angle + horizontal_offset
+    
+    # 计算3D坐标（相对于点位）
+    # 水平方向的距离分量
+    dx = estimated_distance * math.cos(final_angle)
+    dy = estimated_distance * math.sin(final_angle)
+    
+    # 垂直方向（z轴），考虑垂直角度偏移
+    # 假设相机高度约1.6米（人眼高度）
+    dz = -estimated_distance * math.tan(vertical_offset)
+    
+    # 计算最终的绝对坐标
+    product_x = point_coord.get('position_x', 0) + dx
+    product_y = point_coord.get('position_y', 0) + dy
+    product_z = point_coord.get('position_z', 0) + dz
+    
+    return {
+        'x': round(product_x, 3),
+        'y': round(product_y, 3),
+        'z': round(product_z, 3)
+    }
+
+
 def encode_image_to_base64(image_path: str) -> Optional[str]:
     """将图片文件编码为 base64 字符串"""
     try:
@@ -157,26 +281,31 @@ def call_doubao_vision_api(
         print('[ERROR] 未设置 DOUBAO_API_KEY 环境变量')
         return None
     
-    # 准备图片内容（选择 f 方向作为主要分析对象，其他方向可选）
-    # 这里为了降低 token 消耗，只选择前视图（f）进行分析
-    front_image = None
+    # 准备四个方向的图片（f/b/l/r）
+    direction_images = {'f': None, 'b': None, 'l': None, 'r': None}
+    
     for path in image_paths:
-        if path.endswith('_f.jpg'):
-            front_image = path
-            break
+        for direction in ['f', 'b', 'l', 'r']:
+            if path.endswith(f'_{direction}.jpg'):
+                direction_images[direction] = path
+                break
     
-    if not front_image:
-        # 如果没有 f 方向，使用第一张
-        front_image = image_paths[0] if image_paths else None
+    # 编码所有找到的图片
+    encoded_images = []
+    for direction in ['f', 'b', 'l', 'r']:
+        if direction_images[direction]:
+            img_base64 = encode_image_to_base64(direction_images[direction])
+            if img_base64:
+                encoded_images.append({
+                    'direction': direction,
+                    'base64': img_base64
+                })
     
-    if not front_image:
+    if not encoded_images:
         print('[WARN] 未找到有效图片')
         return None
     
-    # 编码图片
-    image_base64 = encode_image_to_base64(front_image)
-    if not image_base64:
-        return None
+    print(f'[DEBUG] 点位 {seq_id}: 找到 {len(encoded_images)} 个方向的图片：{[img["direction"] for img in encoded_images]}')
     
     # 构建请求
     headers = {
@@ -184,26 +313,38 @@ def call_doubao_vision_api(
         'Authorization': f'Bearer {api_key}'
     }
     
-    # 在提示词中加入点位编号信息
-    full_prompt = f"【当前 VR 点位编号：{seq_id}】\n\n{prompt}"
+    # 在提示词中加入点位编号和方向信息
+    full_prompt = f"【当前 VR 点位编号：{seq_id}】\n"
+    full_prompt += f"【图片方向：共 {len(encoded_images)} 个视角，按顺序为 "
+    full_prompt += "、".join([f"图{i+1}({img['direction']}-{'前' if img['direction']=='f' else '后' if img['direction']=='b' else '左' if img['direction']=='l' else '右'})" 
+                              for i, img in enumerate(encoded_images)])
+    full_prompt += "】\n\n"
+    full_prompt += prompt
+    
+    # 构建内容数组，包含所有图片和提示词
+    content = []
+    
+    # 先添加所有图片
+    for img in encoded_images:
+        content.append({
+            'type': 'image_url',
+            'image_url': {
+                'url': f'data:image/jpeg;base64,{img["base64"]}'
+            }
+        })
+    
+    # 最后添加文本提示词
+    content.append({
+        'type': 'text',
+        'text': full_prompt
+    })
     
     payload = {
         'model': DOUBAO_MODEL,
         'messages': [
             {
                 'role': 'user',
-                'content': [
-                    {
-                        'type': 'image_url',
-                        'image_url': {
-                            'url': f'data:image/jpeg;base64,{image_base64}'
-                        }
-                    },
-                    {
-                        'type': 'text',
-                        'text': full_prompt
-                    }
-                ]
+                'content': content
             }
         ],
         'temperature': 0.7,
@@ -257,10 +398,18 @@ def process_brand(
     brand_folder: str,
     api_key: str,
     endpoint: str,
-    prompt: str
+    prompt: str,
+    vr_loc_list: Optional[List[int]] = None
 ) -> Dict:
     """
     处理单个品牌的所有全景图片
+    
+    Args:
+        brand_folder: 品牌文件夹路径
+        api_key: API 密钥
+        endpoint: API 端点
+        prompt: 提示词
+        vr_loc_list: VR 点位筛选列表，None 表示处理全部点位
     
     Returns:
         {
@@ -268,6 +417,7 @@ def process_brand(
             'results': [
                 {
                     'panorama_id': 'uuid_index',
+                    'seq_id': 点位编号,
                     'images': ['path1', 'path2', ...],
                     'analysis': {...}  # 模型返回的分析结果
                 },
@@ -279,6 +429,9 @@ def process_brand(
     """
     brand_name = os.path.basename(brand_folder)
     images_dir = os.path.join(brand_folder, 'images')
+    
+    # 加载点位坐标信息
+    coordinates = load_panorama_coordinates(brand_folder)
     
     # 分组全景图片
     panorama_groups = group_panorama_images(images_dir)
@@ -292,7 +445,12 @@ def process_brand(
             'fail_count': 0
         }
     
-    print(f'\n[INFO] 开始处理品牌: {brand_name}（共 {len(panorama_groups)} 个全景位置）')
+    # 如果有点位筛选，计算实际要处理的点位数
+    if vr_loc_list is not None:
+        filtered_count = sum(1 for pg in panorama_groups.values() if pg['seq_id'] in vr_loc_list)
+        print(f'\n[INFO] 开始处理品牌: {brand_name}（共 {len(panorama_groups)} 个全景位置，筛选后 {filtered_count} 个）')
+    else:
+        print(f'\n[INFO] 开始处理品牌: {brand_name}（共 {len(panorama_groups)} 个全景位置）')
     
     results = []
     success_count = 0
@@ -303,6 +461,17 @@ def process_brand(
         seq_id = panorama_data['seq_id']
         image_paths = panorama_data['images']
         
+        # 如果指定了点位列表，只处理列表中的点位
+        if vr_loc_list is not None and seq_id not in vr_loc_list:
+            continue
+        
+        # 从图片路径中提取方向信息（使用 f 方向的图片）
+        direction = 'f'  # 默认使用前视图
+        for path in image_paths:
+            if '_f.jpg' in path:
+                direction = 'f'
+                break
+        
         analysis = call_doubao_vision_api(
             image_paths,
             prompt,
@@ -312,6 +481,22 @@ def process_brand(
         )
         
         if analysis:
+            # 为每个商品计算3D坐标
+            if 'products' in analysis and seq_id in coordinates:
+                point_coord = coordinates[seq_id]
+                for product in analysis['products']:
+                    if 'bbox' in product and product['bbox']:
+                        try:
+                            product_3d = calculate_product_3d_position(
+                                product['bbox'],
+                                direction,
+                                point_coord
+                            )
+                            product['position_3d'] = product_3d
+                        except Exception as e:
+                            print(f'[WARN] 计算3D坐标失败: {e}')
+                            product['position_3d'] = None
+            
             results.append({
                 'panorama_id': panorama_id,
                 'seq_id': seq_id,
@@ -361,6 +546,11 @@ def main():
         help='是否只处理 brand_list.py 中的品牌'
     )
     parser.add_argument(
+        '--vr_loc_list',
+        action='store_true',
+        help='是否只处理 brand_list.py 中指定的 VR 点位号（vr_loc_list）'
+    )
+    parser.add_argument(
         '--panorama_dir',
         type=str,
         default=DEFAULT_PANORAMA_DIR,
@@ -406,6 +596,17 @@ def main():
             print('[ERROR] 无法导入 brand_list.py')
             sys.exit(1)
     
+    # 确定需要处理的 VR 点位
+    vr_filter = None
+    if args.vr_loc_list:
+        try:
+            from brand_list import vr_loc_list
+            vr_filter = vr_loc_list
+            print(f'[INFO] 已加载 VR 点位筛选列表：{vr_filter}')
+        except ImportError:
+            print('[ERROR] 无法从 brand_list.py 导入 vr_loc_list')
+            sys.exit(1)
+    
     # 获取品牌文件夹列表
     brand_folders = get_brand_folders(args.panorama_dir, brand_filter)
     
@@ -429,7 +630,8 @@ def main():
                 brand_folder,
                 args.api_key,
                 args.endpoint,
-                vr_pic_prompt
+                vr_pic_prompt,
+                vr_filter
             )
             
             # 保存结果
