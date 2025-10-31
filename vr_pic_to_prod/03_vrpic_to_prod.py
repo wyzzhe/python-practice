@@ -667,7 +667,7 @@ def process_brand(
     api_key: str,
     base_url: str,
     vr_loc_list: Optional[List[int]] = None,
-    max_product_points: int = 10,
+    max_product_points: int = 5,
     max_store_points: int = 10
 ) -> Dict:
     """
@@ -678,7 +678,7 @@ def process_brand(
         api_key: API 密钥
         base_url: API 基础 URL
         vr_loc_list: VR 点位筛选列表，None 表示处理全部点位
-        max_product_points: 商品分析最大点位数，默认 10 个
+        max_product_points: 商品分析最大点位数，默认 5 个
         max_store_points: 店铺分析最大点位数，默认 10 个
     
     Returns:
@@ -897,8 +897,8 @@ def main():
     parser.add_argument(
         '--max_product_points',
         type=int,
-        default=10,
-        help='商品分析最大点位数（默认10个）'
+        default=5,
+        help='商品分析最大点位数（默认5个）'
     )
     parser.add_argument(
         '--max_store_points',
