@@ -20,7 +20,7 @@ brand_list = [
     # 鞋履类
     "BIRKENSTOCK", "HUGO BOSS",
     # 汽车类
-    "蔚来", "特斯拉",
+    # "蔚来", "特斯拉",
     # 户外运动类
     "PeakPerformance", "K-Way",
 ]

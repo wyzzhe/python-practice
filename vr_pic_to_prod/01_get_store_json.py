@@ -3,6 +3,7 @@ import json
 import os
 import time
 from typing import Dict, List
+from store_view_dict import store_view_dict
 
 def fetch_store_data(store_id: str, store_name: str) -> bool:
     """
@@ -76,76 +77,4 @@ def batch_fetch_stores(store_list: Dict[str, str], delay: float = 1.0):
 # 使用方法
 if __name__ == "__main__":
     # 你的店铺列表
-    stores = {
-        "BIRKENSTOCK": "rnigHTJW6gZ1WvN8",
-        "JOMALONE": "wProWw3VWvxMXjSe",
-        "MCM": "IggvX5NAGCBYGghG",
-        "HOURGLASS": "t9UIduAKaGQ6iSpL",
-        "SK-2": "WURVaubhFG1Zo4i7",
-        "ARMANI": "3JDW9p6znrMepLeW",
-        "Whoo": "jZodpniiOIyKB0T4",
-        "apm": "hmYDdSnqARaUL53I",
-        "PRADA": "ak3kgLadqHujKhub",
-        "BVLGARI": "LpyhRRXZa4G4DSxm",
-        "GUERLAIN": "0GqnCykmp5mOeGoQ",
-        "JORDAN": "HDUJQhI8E18QsxPk",
-        "SKINCEUTICALS": "xzGVEl38OXW9Zid5",
-        "BROMPTON": "N1vfzj3dO5rgiSJt",
-        "BOBBIBROWN": "6NLu57R9xBvtHe6V",
-        "ACQUADIPARMA": "O8mlHKnzTO2mbOmY",
-        "cledepeau": "ZcuSRtGblQozinwK",
-        "TOMFORD": "JJ9Gbpcytf9gwCSN",
-        "HERMES": "P1BLhggCACUmdSS3",
-        "LANCOME": "rUfFij7SItdZtJXJ",
-        "DECORTE": "SsH8RekNya3OOPKz",
-        "VALMONT": "p5R3uVLXilDq9RhE",
-        "sisly": "MMzt3bZ1qXnsgSKc",
-        "laprairie": "FOoMcyY53FdQ4QMZ",
-        "Eland": "w5dYvSXJ0hwxwK86",
-        "CLARINS": "vXYYtYkxYtWOTRZh",
-        "13DEMARZO": "8G9EN0maAHsqvbnV",
-        "WE11DONE": "lwsugpDHzMY1zObr",
-        "MICHAELKORS": "FBYSLzoCVQ8mihaZ",
-        "蔚来": "q9miW0WJbi7HycrE",
-        "BALLY": "93yqMh6CZEOmksbE",
-        "OMEGA": "nKNnCpr4FVuyprVu",
-        "Caurtier": "dnMffFWJ7BRKDrTU",
-        "HEFANG": "F0iNsPY8PQJluclQ",
-        "CUCCI": "8ZmBSWC9VvAnKkZG",
-        "IWC": "znTthd2FSEnmjQLV",
-        "智己": "i3fumkKm7tFtYusJ",
-        "睿锦尚品": "P0xC1z9hVr3zmJmo",
-        "TUDOR": "ZHvseHy0ATYHaRyN",
-        "L'OCCITANE": "fuH9KBjx2TzSNzGf",
-        "DIOR": "Pykl9tIdgeXnq00A",
-        "HIEIDO": "RE8KrirSDSt6Y5l2",
-        "LAMER": "TYCOtw4zpRnVYc6n",
-        "雅诗兰黛": "n1lmIUsnhnoLv994",
-        "GIVENCHY": "dnGOm3Fs3yin8btm",
-        "BOOS": "qdOgKDWts8cB2PCC",
-        "六福珠宝": "wsw0UmU9FdiG2EKC",
-        "老庙": "xfCOfrfS1a0THHdX",
-        "老凤祥": "rrTijKwe7bzYKkxU",
-        "诗普琳": "S01PXrezDO2vZn7H",
-        "中国珠宝": "QYQYy32fPjL11VGs",
-        "周生生": "irGehvOv1nWI24Y0",
-        "潮宏基": "Guu2q4xqu3m7xVV9",
-        "周大生": "tafGlH95BnEY46aF",
-        "DR": "pGqn9Aov6EPQEbpS",
-        "中国黄金": "q3hgWcAmCDkxXiQO",
-        "Dissona": "537VM2h98CmQa75M",
-        "珠利莱": "fzmhb2EATcSWpPS5",
-        "ST&SAT": "NVnfSXUtfhOWKFJG",
-        "GG-CC": "sOpglG1QDVsJDULW",
-        "太平鸟": "awldtX6UIJI9ZhXr",
-        "MO&CO": "yMTCrfwjO6NzN9Ep",
-        "安踏": "iaLmwKGtFquzmC5d",
-        "李宁": "Rcreb3uQgdTqz8U5",
-        "耐克": "ZMdyjpLTu1ATFNi0",
-        "O'eat": "RnbLw8dT9JWulKP3",
-        "兰湘子": "iOe8mUI7u0jouEXK",
-        "阿吉豆": "lis7L2XkpVWDtJvC",
-        "浮光之秋": "CZqWyGLGzvpbJXnW"
-    }
-    
-    batch_fetch_stores(stores, delay=0.5)
+    batch_fetch_stores(store_view_dict, delay=0.5)
