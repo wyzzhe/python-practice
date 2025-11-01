@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺商品分析报告</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+            line-height: 1.8;
+            color: #1a202c;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4 {
+            text-align: left;
+        }
+        p {
+            text-align: left;
+        }
+        h1 {
+            color: #1a202c;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 20px 0 15px 0;
+            margin: 40px 0 30px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: white;
+            padding-left: 20px;
+            padding-right: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        h2 {
+            color: #1a202c;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px 20px;
+            margin: 35px 0 20px 0;
+            border-radius: 8px;
+            font-size: 1.8em;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        h3 {
+            color: #1a202c;
+            margin: 25px 0 15px 0;
+            font-size: 1.5em;
+            font-weight: 600;
+            padding-left: 15px;
+            border-left: 4px solid #e2e8f0;
+        }
+        h4 {
+            color: #718096;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+        p {
+            margin: 10px 0;
+            padding: 0 10px;
+            text-align: left;
+        }
+        ul, ol {
+            margin: 10px auto;
+            padding-left: 30px;
+            display: inline-block;
+            text-align: left;
+        }
+        li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 25px auto;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        table.data-table th {
+            background: #f7fafc;
+            color: #1a202c;
+            padding: 16px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        table.data-table th:first-child {
+            border-top-left-radius: 12px;
+        }
+        table.data-table th:last-child {
+            border-top-right-radius: 12px;
+        }
+        table.data-table td {
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            background-color: #ffffff;
+            color: #1a202c;
+            font-size: 0.9em;
+            line-height: 1.8;
+            text-align: left;
+        }
+        table.data-table td p {
+            margin: 8px 0;
+            padding: 0;
+            color: #1a202c;
+        }
+        table.data-table td strong {
+            color: #1a202c;
+            font-weight: 700;
+            background-color: transparent;
+        }
+        table.data-table td .product-label {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        table.data-table tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+        table.data-table tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+        table.data-table tr:nth-child(even) td {
+            background-color: #f7fafc;
+        }
+        table.data-table tr:hover td {
+            background-color: #edf2f7;
+            transition: background-color 0.2s ease;
+        }
+        table.data-table tr:last-child td {
+            border-bottom: none;
+        }
+        a {
+            color: #1a202c;
+            text-decoration: underline;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: #2d3748;
+            text-decoration: underline;
+        }
+        strong {
+            color: #1a202c;
+            font-weight: 700;
+        }
+        table.data-table td a {
+            color: #1a202c;
+            background-color: transparent;
+            padding: 0;
+            text-decoration: underline;
+        }
+        table.data-table td a:hover {
+            color: #2d3748;
+            background-color: transparent;
+            padding: 0;
+        }
+        .category-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+        }
+    </style>
+</head>
+<body>
+<h1>店铺商品分析报告（精简版）</h1>
+
+<p>本报告为精简版本，包含两部分内容：</p>
+<ol>
+<li><strong>商品分析</strong>: 每个类别选择一个店铺，每个店铺选择5个点位，每个点位选择3个推荐商品和2个不推荐商品</li>
+<li><strong>店铺分析</strong>: 每个类别选择一个店铺，每个店铺选择5个点位</li>
+</ol>
+
+<h1>第一部分：商品分析（精简版）</h1>
+
+<p>本部分展示精简版本：每个类别选择一个店铺，每个店铺选择5个点位，每个点位选择3个推荐商品和2个不推荐商品。推荐商品已标记 ⭐ 并包含 VR 链接。</p>
+
+
+<h2>家居用品类 - 睿锦尚品</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>家居用品类</th>
+<th>睿锦尚品</th>
+<th>1339861</th>
+<th><a href="images/685c720f09614b06a27efccb174e1a70_25_b_7.jpg" target="_blank">后</a><br><a href="images/685c720f09614b06a27efccb174e1a70_25_f_7.jpg" target="_blank">前</a><br><a href="images/685c720f09614b06a27efccb174e1a70_25_l_7.jpg" target="_blank">左</a><br><a href="images/685c720f09614b06a27efccb174e1a70_25_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>灰色织物连帽卫衣（搭配黑色裤子、黑色皮革手提包、图案头巾）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 连帽卫衣（模特展示套装）<br>• <strong>颜色</strong>: 灰、黑<br>• <strong>材质</strong>: 织物、皮革<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-8.222, -8.232, 0.11)<br><br>• <strong>名称</strong>: <strong>黑色皮革高跟鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 高跟鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架（金色鞋架）<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-6.257, -9.78, 0.863)<br><br>• <strong>名称</strong>: <strong>棕色皮革手提包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架（金色鞋架）<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-6.054, -9.768, 0.325)<br><br>• <strong>名称</strong>: 白色织物羽绒服<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂架<br>• <strong>视图方向</strong>: 右<br><br>• <strong>名称</strong>: 黑色织物羽绒服<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂架<br>• <strong>视图方向</strong>: 右</th>
+<th><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339861&dirx=-8.222&diry=-8.232&dirz=0.11" target="_blank">灰色织物连帽卫衣（搭配黑色裤子、黑色皮革手提包、图案头巾）</a><br><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339861&dirx=-6.257&diry=-9.78&dirz=0.863" target="_blank">黑色皮革高跟鞋</a><br><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339861&dirx=-6.054&diry=-9.768&dirz=0.325" target="_blank">棕色皮革手提包</a></th>
+</tr>
+<tr>
+<td>家居用品类</td>
+<td>睿锦尚品</td>
+<td>1339868</td>
+<td><a href="images/685c720f09614b06a27efccb174e1a70_32_b_7.jpg" target="_blank">后</a><br><a href="images/685c720f09614b06a27efccb174e1a70_32_f_7.jpg" target="_blank">前</a><br><a href="images/685c720f09614b06a27efccb174e1a70_32_l_7.jpg" target="_blank">左</a><br><a href="images/685c720f09614b06a27efccb174e1a70_32_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: Alexander McQueen白色皮革绿尾运动鞋<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 白、绿<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架（下层）<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Alexander McQueen粉色皮革厚底运动鞋<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 粉、白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架（下层）<br>• <strong>视图方向</strong>: 前</td>
+<td>-</td>
+</tr>
+<tr>
+<td>家居用品类</td>
+<td>睿锦尚品</td>
+<td>1339876</td>
+<td><a href="images/685c720f09614b06a27efccb174e1a70_40_b_7.jpg" target="_blank">后</a><br><a href="images/685c720f09614b06a27efccb174e1a70_40_f_7.jpg" target="_blank">前</a><br><a href="images/685c720f09614b06a27efccb174e1a70_40_l_7.jpg" target="_blank">左</a><br><a href="images/685c720f09614b06a27efccb174e1a70_40_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>黑色织物外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-19.584, -4.25, 0.573)<br><br>• <strong>名称</strong>: <strong>黑色皮革手提包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-19.578, -4.14, 0.494)<br><br>• <strong>名称</strong>: <strong>白色皮革溶解休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 地面石头造型<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-19.593, -3.842, 0.12)<br><br>• <strong>名称</strong>: MMY黄色皮革溶解休闲鞋<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: MMY黑色皮革溶解休闲鞋<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339876&dirx=-19.584&diry=-4.25&dirz=0.573" target="_blank">黑色织物外套</a><br><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339876&dirx=-19.578&diry=-4.14&dirz=0.494" target="_blank">黑色皮革手提包</a><br><a href="https://vr.aibee.cn/store/P0xC1z9hVr3zmJmo?pid=1339876&dirx=-21.562&diry=-2.093&dirz=0.302" target="_blank">白色皮革溶解休闲鞋</a></td>
+</tr>
+</table>
+
+<h2>时尚服饰类 - 13DEMARZO</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>时尚服饰类</th>
+<th>13DEMARZO</th>
+<th>1339634</th>
+<th><a href="images/3ec665f5375f498db3e4125001fc567b_10_b_7.jpg" target="_blank">后</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_10_f_7.jpg" target="_blank">前</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_10_l_7.jpg" target="_blank">左</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>13DE MARZO米色毛绒座椅</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 座椅<br>• <strong>颜色</strong>: 米<br>• <strong>材质</strong>: 毛绒<br>• <strong>位置</strong>: 地面<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (0.713, -15.504, -0.083)<br><br>• <strong>名称</strong>: <strong>13DE MARZO金色/白色金属饰品</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 饰品<br>• <strong>颜色</strong>: 金、白<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 展示柜<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (2.358, -12.367, 0.326)<br><br>• <strong>名称</strong>: 13DE MARZO黑色织物带小熊挂件外套<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂杆<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 13DE MARZO红色织物无袖上衣<br>• <strong>类型</strong>: 无袖上衣<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂杆<br>• <strong>视图方向</strong>: 前</th>
+<th><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339634&dirx=0.713&diry=-15.504&dirz=-0.083" target="_blank">13DE MARZO米色毛绒座椅</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339634&dirx=2.358&diry=-12.367&dirz=0.326" target="_blank">13DE MARZO金色/白色金属饰品</a></th>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339635</td>
+<td><a href="images/3ec665f5375f498db3e4125001fc567b_11_b_7.jpg" target="_blank">后</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_11_f_7.jpg" target="_blank">前</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_11_l_7.jpg" target="_blank">左</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_11_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>13DE MARZO银色金属首饰</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 项链<br>• <strong>颜色</strong>: 银<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 首饰展示柜<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (1.702, -14.204, -0.138)<br><br>• <strong>名称</strong>: <strong>13DE MARZO黑色毛绒小熊装饰外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 毛绒、织物<br>• <strong>位置</strong>: 移动衣架<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (3.017, -14.038, 0.565)<br><br>• <strong>名称</strong>: <strong>13DE MARZO黑白熊猫织物背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (0.655, -15.511, 0.722)<br><br>• <strong>名称</strong>: 13DE MARZO白色织物T恤<br>• <strong>类型</strong>: T恤<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面衣架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 13DE MARZO浅蓝色织物卫衣<br>• <strong>类型</strong>: 卫衣<br>• <strong>颜色</strong>: 浅蓝<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面衣架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339635&dirx=1.702&diry=-14.204&dirz=-0.138" target="_blank">13DE MARZO银色金属首饰</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339635&dirx=3.017&diry=-14.038&dirz=0.565" target="_blank">13DE MARZO黑色毛绒小熊装饰外套</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339635&dirx=0.655&diry=-15.511&dirz=0.722" target="_blank">13DE MARZO黑白熊猫织物背包</a></td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339636</td>
+<td><a href="images/3ec665f5375f498db3e4125001fc567b_12_b_7.jpg" target="_blank">后</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_12_f_7.jpg" target="_blank">前</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_12_l_7.jpg" target="_blank">左</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_12_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>未知品牌多色金属/宝石饰品（戒指/项链）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 饰品（戒指/项链）<br>• <strong>颜色</strong>: 白、金、粉<br>• <strong>材质</strong>: 金属、宝石<br>• <strong>位置</strong>: 中央玻璃柜台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.649, -19.364, 0.016)<br><br>• <strong>名称</strong>: 未知品牌黑色织物毛绒领外套<br>• <strong>类型</strong>: 毛绒领外套<br>• <strong>颜色</strong>: 黑、米白<br>• <strong>材质</strong>: 织物、毛绒<br>• <strong>位置</strong>: 左侧衣架（前视角）<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 未知品牌黑色织物带扣连帽外套<br>• <strong>类型</strong>: 带扣连帽外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 左侧衣架（前视角）<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339636&dirx=3.649&diry=-19.364&dirz=0.016" target="_blank">未知品牌多色金属/宝石饰品（戒指/项链）</a></td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339637</td>
+<td><a href="images/3ec665f5375f498db3e4125001fc567b_13_b_7.jpg" target="_blank">后</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_13_f_7.jpg" target="_blank">前</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_13_l_7.jpg" target="_blank">左</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_13_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>13DE MARZO银色金属首饰套装</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 首饰<br>• <strong>颜色</strong>: 银、白<br>• <strong>材质</strong>: 金属、珍珠<br>• <strong>位置</strong>: 中央展示柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.402, -17.593, -0.54)<br><br>• <strong>名称</strong>: <strong>13DE MARZO多色织物毛绒玩具（柜台）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 毛绒玩具<br>• <strong>颜色</strong>: 米、棕、黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面下方柜台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.573, -18.162, 0.422)<br><br>• <strong>名称</strong>: <strong>13DE MARZO多色织物帽子（柜台）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 帽子<br>• <strong>颜色</strong>: 黑、白、黄<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面下方柜台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.573, -18.162, 0.422)<br><br>• <strong>名称</strong>: 13DE MARZO多色织物外套（右侧衣架）<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 绿、白、灰、黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 右侧衣架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 13DE MARZO米红色织物圆领毛衣<br>• <strong>类型</strong>: 毛衣<br>• <strong>颜色</strong>: 米、红<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 左侧衣架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339637&dirx=3.402&diry=-17.593&dirz=-0.54" target="_blank">13DE MARZO银色金属首饰套装</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339637&dirx=3.573&diry=-18.162&dirz=0.422" target="_blank">13DE MARZO多色织物毛绒玩具（柜台）</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339637&dirx=3.573&diry=-18.162&dirz=0.422" target="_blank">13DE MARZO多色织物帽子（柜台）</a></td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339638</td>
+<td><a href="images/3ec665f5375f498db3e4125001fc567b_14_b_7.jpg" target="_blank">后</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_14_f_7.jpg" target="_blank">前</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_14_l_7.jpg" target="_blank">左</a><br><a href="images/3ec665f5375f498db3e4125001fc567b_14_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>毛绒坐具</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 毛绒坐具<br>• <strong>颜色</strong>: 米白<br>• <strong>材质</strong>: 毛绒<br>• <strong>位置</strong>: 中央地面<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.335, -19.321, 0.39)<br><br>• <strong>名称</strong>: <strong>毛绒坐具</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 毛绒坐具<br>• <strong>颜色</strong>: 米白<br>• <strong>材质</strong>: 毛绒<br>• <strong>位置</strong>: 中央地面<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.432, -19.072, 0.422)<br><br>• <strong>名称</strong>: <strong>13DE MARZO浅棕色毛绒泰迪熊</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 毛绒玩具<br>• <strong>颜色</strong>: 浅棕<br>• <strong>材质</strong>: 毛绒<br>• <strong>位置</strong>: 墙面层架（中层）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.48, -18.048, 0.738)<br><br>• <strong>名称</strong>: 黑色带毛绒领外套<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物、毛绒<br>• <strong>位置</strong>: 墙面衣架（后方向）<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 红色织物外套<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面衣架（后方向）<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339638&dirx=3.432&diry=-19.072&dirz=0.422" target="_blank">毛绒坐具</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339638&dirx=3.432&diry=-19.072&dirz=0.422" target="_blank">毛绒坐具</a><br><a href="https://vr.aibee.cn/store/8G9EN0maAHsqvbnV?pid=1339638&dirx=3.48&diry=-18.048&dirz=0.738" target="_blank">13DE MARZO浅棕色毛绒泰迪熊</a></td>
+</tr>
+</table>
+
+<h2>珠宝首饰类 - BVLGARI</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>珠宝首饰类</th>
+<th>BVLGARI</th>
+<th>1333526</th>
+<th><a href="images/b394910f42024154b01980b216266ea9_1_b_7.jpg" target="_blank">后</a><br><a href="images/b394910f42024154b01980b216266ea9_1_f_7.jpg" target="_blank">前</a><br><a href="images/b394910f42024154b01980b216266ea9_1_l_7.jpg" target="_blank">左</a><br><a href="images/b394910f42024154b01980b216266ea9_1_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>BVLGARI宝格丽香水</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 红、橙、粉、紫、透明<br>• <strong>材质</strong>: 玻璃、金属、纸质<br>• <strong>位置</strong>: 墙面层架、中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-2.273, 1.633, 0.88)<br><br>• <strong>名称</strong>: <strong>Clarins娇韵诗双萃精华液</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 精华液<br>• <strong>颜色</strong>: 透明、绿<br>• <strong>材质</strong>: 玻璃、塑料<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.053, -0.162, 0.565)<br><br>• <strong>名称</strong>: <strong>SKINCEUTICALS修丽可精华液（色修、B5、AGE面霜）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 精华液、面霜<br>• <strong>颜色</strong>: 绿、蓝、白、透明<br>• <strong>材质</strong>: 玻璃、塑料<br>• <strong>位置</strong>: 墙面广告牌<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-3.535, -2.15, 0.88)</th>
+<th><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333526&dirx=-2.273&diry=1.633&dirz=0.88" target="_blank">BVLGARI宝格丽香水</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333526&dirx=-1.053&diry=-0.162&dirz=0.565" target="_blank">Clarins娇韵诗双萃精华液</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333526&dirx=-3.535&diry=-2.15&dirz=0.88" target="_blank">SKINCEUTICALS修丽可精华液（色修、B5、AGE面霜）</a></th>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333528</td>
+<td><a href="images/b394910f42024154b01980b216266ea9_2_b_7.jpg" target="_blank">后</a><br><a href="images/b394910f42024154b01980b216266ea9_2_f_7.jpg" target="_blank">前</a><br><a href="images/b394910f42024154b01980b216266ea9_2_l_7.jpg" target="_blank">左</a><br><a href="images/b394910f42024154b01980b216266ea9_2_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>BVLGARI橙色纸质礼盒（红丝带装饰）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 橙、红<br>• <strong>材质</strong>: 纸<br>• <strong>位置</strong>: 墙面层架（上）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.219, 0.768, 2.067)<br><br>• <strong>名称</strong>: <strong>BVLGARI橙色玻璃香水瓶（带粉色底座）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶（展示用）<br>• <strong>颜色</strong>: 橙、粉、白<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面圆形灯箱<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.203, 0.741, 1.211)<br><br>• <strong>名称</strong>: <strong>绿色玻璃护肤品瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 护肤品瓶<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 前展台（左）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-3.988, -0.731, 0.333)</td>
+<td><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333528&dirx=-5.558&diry=1.701&dirz=0.541" target="_blank">BVLGARI橙色纸质礼盒（红丝带装饰）</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333528&dirx=-4.203&diry=0.741&dirz=1.211" target="_blank">BVLGARI橙色玻璃香水瓶（带粉色底座）</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333528&dirx=-3.988&diry=-0.731&dirz=0.333" target="_blank">绿色玻璃护肤品瓶</a></td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333529</td>
+<td><a href="images/b394910f42024154b01980b216266ea9_3_b_7.jpg" target="_blank">后</a><br><a href="images/b394910f42024154b01980b216266ea9_3_f_7.jpg" target="_blank">前</a><br><a href="images/b394910f42024154b01980b216266ea9_3_l_7.jpg" target="_blank">左</a><br><a href="images/b394910f42024154b01980b216266ea9_3_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>LE GEMME黑色玻璃金色瓶盖香水</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 黑、金<br>• <strong>材质</strong>: 玻璃、金属<br>• <strong>位置</strong>: 前视角展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.315, 0.541, -0.645)<br><br>• <strong>名称</strong>: <strong>黑色金属装饰香水小样</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水小样<br>• <strong>颜色</strong>: 黑、金<br>• <strong>材质</strong>: 陶瓷、金属<br>• <strong>位置</strong>: 前视角展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.17, 1.085, -0.888)<br><br>• <strong>名称</strong>: <strong>白色塑料人形模特（戴粉色织物发带）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 人形展示模特<br>• <strong>颜色</strong>: 白、粉<br>• <strong>材质</strong>: 塑料、织物<br>• <strong>位置</strong>: 左侧展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-6.235, -0.678, 0.065)<br><br>• <strong>名称</strong>: 橙色纸质红色丝带香水礼盒<br>• <strong>类型</strong>: 香水礼盒<br>• <strong>颜色</strong>: 橙、红<br>• <strong>材质</strong>: 纸质<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左<br><br>• <strong>名称</strong>: 红色玻璃香水<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左</td>
+<td><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333529&dirx=-4.315&diry=0.541&dirz=-0.645" target="_blank">LE GEMME黑色玻璃金色瓶盖香水</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333529&dirx=-4.17&diry=1.085&dirz=-0.888" target="_blank">黑色金属装饰香水小样</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333529&dirx=-6.235&diry=-0.678&dirz=0.065" target="_blank">白色塑料人形模特（戴粉色织物发带）</a></td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333531</td>
+<td><a href="images/b394910f42024154b01980b216266ea9_4_b_7.jpg" target="_blank">后</a><br><a href="images/b394910f42024154b01980b216266ea9_4_f_7.jpg" target="_blank">前</a><br><a href="images/b394910f42024154b01980b216266ea9_4_l_7.jpg" target="_blank">左</a><br><a href="images/b394910f42024154b01980b216266ea9_4_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>白色玻璃护肤品瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 护肤品瓶<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.072, 1.069, -0.672)<br><br>• <strong>名称</strong>: <strong>粉色玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 粉<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-3.848, 1.518, -0.816)<br><br>• <strong>名称</strong>: <strong>透明玻璃粉色香水</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 透明、粉<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-3.767, 1.821, -0.626)</td>
+<td><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333531&dirx=-4.072&diry=1.069&dirz=-0.672" target="_blank">白色玻璃护肤品瓶</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333531&dirx=-3.848&diry=1.518&dirz=-0.816" target="_blank">粉色玻璃香水瓶</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333531&dirx=-3.767&diry=1.821&dirz=-0.626" target="_blank">透明玻璃粉色香水</a></td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333533</td>
+<td><a href="images/b394910f42024154b01980b216266ea9_5_b_7.jpg" target="_blank">后</a><br><a href="images/b394910f42024154b01980b216266ea9_5_f_7.jpg" target="_blank">前</a><br><a href="images/b394910f42024154b01980b216266ea9_5_l_7.jpg" target="_blank">左</a><br><a href="images/b394910f42024154b01980b216266ea9_5_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>BVLGARI Eau Parfumee The Bluver/The Vert香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 透明、蓝<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面广告牌<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-7.83, -1.084, 1.648)<br><br>• <strong>名称</strong>: <strong>BVLGARI红丝带礼盒（左）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 棕、红<br>• <strong>材质</strong>: 纸盒<br>• <strong>位置</strong>: 墙面下展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-7.664, -0.782, -0.254)<br><br>• <strong>名称</strong>: <strong>BVLGARI红丝带礼盒（右）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 棕、红<br>• <strong>材质</strong>: 纸盒<br>• <strong>位置</strong>: 墙面下展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-7.836, -1.098, -0.158)</td>
+<td><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333533&dirx=-7.83&diry=-1.084&dirz=1.648" target="_blank">BVLGARI Eau Parfumee The Bluver/The Vert香水瓶</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333533&dirx=-7.664&diry=-0.782&dirz=-0.254" target="_blank">BVLGARI红丝带礼盒（左）</a><br><a href="https://vr.aibee.cn/store/LpyhRRXZa4G4DSxm?pid=1333533&dirx=-7.836&diry=-1.098&dirz=-0.158" target="_blank">BVLGARI红丝带礼盒（右）</a></td>
+</tr>
+</table>
+
+<h2>箱包类 - BALLY</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>箱包类</th>
+<th>BALLY</th>
+<th>1339711</th>
+<th><a href="images/50c21999a9b5430f957411a2e830b353_10_b_7.jpg" target="_blank">后</a><br><a href="images/50c21999a9b5430f957411a2e830b353_10_f_7.jpg" target="_blank">前</a><br><a href="images/50c21999a9b5430f957411a2e830b353_10_l_7.jpg" target="_blank">左</a><br><a href="images/50c21999a9b5430f957411a2e830b353_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>未知品牌黑色鳄鱼纹皮革手提包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧长凳<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.638, -12.2, -0.017)<br><br>• <strong>名称</strong>: <strong>未知品牌黑色织物外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (0.345, -13.387, -0.056)<br><br>• <strong>名称</strong>: <strong>未知品牌白色织物运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物、橡胶<br>• <strong>位置</strong>: 圆形展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.419, -10.329, 0.289)<br><br>• <strong>名称</strong>: 未知品牌黑色皮革背包<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 未知品牌黑色皮革乐福鞋<br>• <strong>类型</strong>: 乐福鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后</th>
+<th><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339711&dirx=1.638&diry=-12.2&dirz=-0.017" target="_blank">未知品牌黑色鳄鱼纹皮革手提包</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339711&dirx=0.345&diry=-13.387&dirz=-0.056" target="_blank">未知品牌黑色织物外套</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339711&dirx=1.419&diry=-10.329&dirz=0.289" target="_blank">未知品牌白色织物运动鞋</a></th>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339716</td>
+<td><a href="images/50c21999a9b5430f957411a2e830b353_12_b_7.jpg" target="_blank">后</a><br><a href="images/50c21999a9b5430f957411a2e830b353_12_f_7.jpg" target="_blank">前</a><br><a href="images/50c21999a9b5430f957411a2e830b353_12_l_7.jpg" target="_blank">左</a><br><a href="images/50c21999a9b5430f957411a2e830b353_12_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Bally黑色皮革手提包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.048, -10.743, 0.288)<br><br>• <strong>名称</strong>: <strong>Bally黑色合成革运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 合成革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.146, -10.511, 0.353)<br><br>• <strong>名称</strong>: <strong>Bally棕色织物配皮革条纹背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 棕、红、白<br>• <strong>材质</strong>: 织物、皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.192, -9.336, 0.954)<br><br>• <strong>名称</strong>: Bally黑色皮革背包<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Bally黑色皮革手提包<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339716&dirx=1.048&diry=-10.743&dirz=0.288" target="_blank">Bally黑色皮革手提包</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339716&dirx=1.146&diry=-10.511&dirz=0.353" target="_blank">Bally黑色合成革运动鞋</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339716&dirx=1.192&diry=-9.336&dirz=0.954" target="_blank">Bally棕色织物配皮革条纹背包</a></td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339718</td>
+<td><a href="images/50c21999a9b5430f957411a2e830b353_13_b_7.jpg" target="_blank">后</a><br><a href="images/50c21999a9b5430f957411a2e830b353_13_f_7.jpg" target="_blank">前</a><br><a href="images/50c21999a9b5430f957411a2e830b353_13_l_7.jpg" target="_blank">左</a><br><a href="images/50c21999a9b5430f957411a2e830b353_13_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>黑色皮革外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (1.847, -9.474, 0.314)<br><br>• <strong>名称</strong>: <strong>黑色皮革皮鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 皮鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (2.108, -7.112, 0.133)<br><br>• <strong>名称</strong>: <strong>白色皮革运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (2.05, -7.018, 0.183)<br><br>• <strong>名称</strong>: 黑色织物羽绒服<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂杆<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 深蓝色织物西装外套<br>• <strong>类型</strong>: 西装外套<br>• <strong>颜色</strong>: 深蓝<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面挂杆<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339718&dirx=1.847&diry=-9.474&dirz=0.314" target="_blank">黑色皮革外套</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339718&dirx=2.108&diry=-7.112&dirz=0.133" target="_blank">黑色皮革皮鞋</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339718&dirx=2.05&diry=-7.018&dirz=0.183" target="_blank">白色皮革运动鞋</a></td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339720</td>
+<td><a href="images/50c21999a9b5430f957411a2e830b353_14_b_7.jpg" target="_blank">后</a><br><a href="images/50c21999a9b5430f957411a2e830b353_14_f_7.jpg" target="_blank">前</a><br><a href="images/50c21999a9b5430f957411a2e830b353_14_l_7.jpg" target="_blank">左</a><br><a href="images/50c21999a9b5430f957411a2e830b353_14_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>黑色皮革运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲运动鞋<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.434, -7.082, -0.395)<br><br>• <strong>名称</strong>: <strong>黑白条纹休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 织物、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.348, -6.951, -0.183)<br><br>• <strong>名称</strong>: <strong>棕色休闲运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲运动鞋<br>• <strong>颜色</strong>: 棕、白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.381, -4.834, -0.605)<br><br>• <strong>名称</strong>: 黑色皮革公文包（带红白条纹）<br>• <strong>类型</strong>: 公文包<br>• <strong>颜色</strong>: 黑、红、白<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 黑色皮革钱包<br>• <strong>类型</strong>: 钱包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 玻璃展柜<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339720&dirx=-1.434&diry=-7.082&dirz=-0.395" target="_blank">黑色皮革运动鞋</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339720&dirx=-3.783&diry=-7.784&dirz=0.134" target="_blank">黑白条纹休闲鞋</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339720&dirx=-1.381&diry=-4.834&dirz=-0.605" target="_blank">棕色休闲运动鞋</a></td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339721</td>
+<td><a href="images/50c21999a9b5430f957411a2e830b353_15_b_7.jpg" target="_blank">后</a><br><a href="images/50c21999a9b5430f957411a2e830b353_15_f_7.jpg" target="_blank">前</a><br><a href="images/50c21999a9b5430f957411a2e830b353_15_l_7.jpg" target="_blank">左</a><br><a href="images/50c21999a9b5430f957411a2e830b353_15_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>未知品牌深棕色织物运动鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 深棕<br>• <strong>材质</strong>: 织物、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (0.185, -8.571, -0.315)<br><br>• <strong>名称</strong>: <strong>未知品牌黑色皮革运动鞋（白边）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (0.493, -7.754, -0.091)<br><br>• <strong>名称</strong>: <strong>未知品牌黑色皮革手提包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (0.425, -8.061, -0.672)<br><br>• <strong>名称</strong>: 未知品牌黑色皮革背包<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左<br><br>• <strong>名称</strong>: 未知品牌棕色皮革背包<br>• <strong>类型</strong>: 背包<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 右</td>
+<td><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339721&dirx=0.185&diry=-8.571&dirz=-0.315" target="_blank">未知品牌深棕色织物运动鞋</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339721&dirx=0.493&diry=-7.754&dirz=-0.091" target="_blank">未知品牌黑色皮革运动鞋（白边）</a><br><a href="https://vr.aibee.cn/store/93yqMh6CZEOmksbE?pid=1339721&dirx=0.425&diry=-8.061&dirz=-0.672" target="_blank">未知品牌黑色皮革手提包</a></td>
+</tr>
+</table>
+
+<h2>美妆护肤类 - ACQUADIPARMA</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>美妆护肤类</th>
+<th>ACQUADIPARMA</th>
+<th>1336089</th>
+<th><a href="images/0abccefc7d3044559694451b3b1ef3a8_10_b_7.jpg" target="_blank">后</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_10_f_7.jpg" target="_blank">前</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_10_l_7.jpg" target="_blank">左</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>Acqua di Parma透明玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 透明<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-8.547, 3.691, -0.38)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma粉色瓶盖透明玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 透明、粉色<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-8.771, 3.35, -1.104)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma蓝色玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 蓝<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 入口圆形展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-7.688, 4.305, -0.36)<br><br>• <strong>名称</strong>: Acqua di Parma黄色纸质圆形礼盒（大尺寸）<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 纸质<br>• <strong>位置</strong>: 墙面层架（上层）<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Acqua di Parma黄色纸质圆形礼盒（中尺寸）<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 纸质<br>• <strong>位置</strong>: 墙面层架（中层）<br>• <strong>视图方向</strong>: 前</th>
+<th><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336089&dirx=-8.33&diry=3.918&dirz=-0.545" target="_blank">Acqua di Parma透明玻璃香水瓶</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336089&dirx=-8.771&diry=3.35&dirz=-1.104" target="_blank">Acqua di Parma粉色瓶盖透明玻璃香水瓶</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336089&dirx=-7.688&diry=4.305&dirz=-0.36" target="_blank">Acqua di Parma蓝色玻璃香水瓶</a></th>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336079</td>
+<td><a href="images/0abccefc7d3044559694451b3b1ef3a8_2_b_7.jpg" target="_blank">后</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_2_f_7.jpg" target="_blank">前</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_2_l_7.jpg" target="_blank">左</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_2_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Acqua di Parma紫色带金点香薰罐</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香薰罐<br>• <strong>颜色</strong>: 紫、金<br>• <strong>材质</strong>: 金属、陶瓷<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-3.296, 0.771, -0.771)<br><br>• <strong>名称</strong>: <strong>红色花枝白色花瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 花瓶<br>• <strong>颜色</strong>: 红、白<br>• <strong>材质</strong>: 陶瓷、塑料<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-3.363, 0.814, 0.043)<br><br>• <strong>名称</strong>: <strong>绿色小圣诞树装饰摆件</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 装饰摆件<br>• <strong>颜色</strong>: 绿、白<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-3.88, 1.038, -0.678)<br><br>• <strong>名称</strong>: 黄色包装盒（墙面层架）<br>• <strong>类型</strong>: 包装盒<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 纸<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 右<br><br>• <strong>名称</strong>: 白色陶瓷花瓶（红色背景层架）<br>• <strong>类型</strong>: 花瓶<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 陶瓷<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336079&dirx=-3.296&diry=0.771&dirz=-0.771" target="_blank">Acqua di Parma紫色带金点香薰罐</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336079&dirx=-3.363&diry=0.814&dirz=0.043" target="_blank">红色花枝白色花瓶</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336079&dirx=-3.88&diry=1.038&dirz=-0.678" target="_blank">绿色小圣诞树装饰摆件</a></td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336080</td>
+<td><a href="images/0abccefc7d3044559694451b3b1ef3a8_3_b_7.jpg" target="_blank">后</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_3_f_7.jpg" target="_blank">前</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_3_l_7.jpg" target="_blank">左</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_3_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>未知品牌蓝白陶瓷装饰罐</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 装饰罐<br>• <strong>颜色</strong>: 蓝、白、黑<br>• <strong>材质</strong>: 陶瓷<br>• <strong>位置</strong>: 墙面红色层架（上层）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.752, -2.38, 1.2)<br><br>• <strong>名称</strong>: <strong>未知品牌黑色罐装护肤品</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 罐装面霜<br>• <strong>颜色</strong>: 黑、白<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 墙面红色层架（上层）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.73, -2.251, 1.013)<br><br>• <strong>名称</strong>: <strong>未知品牌黄色球形商品</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 球形装饰<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 墙面红色层架（上层）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.714, -2.029, 1.002)</td>
+<td><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336080&dirx=-4.752&diry=-2.38&dirz=1.2" target="_blank">未知品牌蓝白陶瓷装饰罐</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336080&dirx=-4.73&diry=-2.251&dirz=1.013" target="_blank">未知品牌黑色罐装护肤品</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336080&dirx=-4.714&diry=-2.029&dirz=1.002" target="_blank">未知品牌黄色球形商品</a></td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336081</td>
+<td><a href="images/0abccefc7d3044559694451b3b1ef3a8_4_b_7.jpg" target="_blank">后</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_4_f_7.jpg" target="_blank">前</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_4_l_7.jpg" target="_blank">左</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_4_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Acqua di Parma蓝色玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 蓝<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.846, -0.903, -0.029)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma黑色玻璃香水瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水瓶<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.95, -1.232, -0.136)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma金色硬质香薰蜡烛</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香薰蜡烛<br>• <strong>颜色</strong>: 金<br>• <strong>材质</strong>: 硬质<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.995, -1.778, 0.159)<br><br>• <strong>名称</strong>: Acqua di Parma黄色硬质礼盒<br>• <strong>类型</strong>: 礼盒<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 纸质<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 红色陶瓷杯<br>• <strong>类型</strong>: 杯子<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 陶瓷<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336081&dirx=-10.846&diry=-0.903&dirz=-0.029" target="_blank">Acqua di Parma蓝色玻璃香水瓶</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336081&dirx=-10.95&diry=-1.232&dirz=-0.136" target="_blank">Acqua di Parma黑色玻璃香水瓶</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336081&dirx=-10.995&diry=-1.778&dirz=0.159" target="_blank">Acqua di Parma金色硬质香薰蜡烛</a></td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336082</td>
+<td><a href="images/0abccefc7d3044559694451b3b1ef3a8_5_b_7.jpg" target="_blank">后</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_5_f_7.jpg" target="_blank">前</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_5_l_7.jpg" target="_blank">左</a><br><a href="images/0abccefc7d3044559694451b3b1ef3a8_5_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Acqua di Parma黄色陶瓷香薰蜡烛</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香薰蜡烛<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 陶瓷、蜡<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-7.892, -2.508, 1.173)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma黄色玻璃瓶装香水</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 黄<br>• <strong>材质</strong>: 玻璃、液体<br>• <strong>位置</strong>: 展示台层架<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.338, 0.595, -0.301)<br><br>• <strong>名称</strong>: <strong>Acqua di Parma黑色玻璃瓶装香水</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 香水<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 玻璃、液体<br>• <strong>位置</strong>: 展示台层架<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.316, 0.618, -0.301)<br><br>• <strong>名称</strong>: 黑色塑料计算器<br>• <strong>类型</strong>: 计算器<br>• <strong>颜色</strong>: 黑、黄<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 桌面<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 黑色塑料鼠标<br>• <strong>类型</strong>: 鼠标<br>• <strong>颜色</strong>: 黑、灰<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 桌面<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336082&dirx=-7.892&diry=-2.508&dirz=1.173" target="_blank">Acqua di Parma黄色陶瓷香薰蜡烛</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336082&dirx=-10.338&diry=0.595&dirz=-0.301" target="_blank">Acqua di Parma黄色玻璃瓶装香水</a><br><a href="https://vr.aibee.cn/store/O8mlHKnzTO2mbOmY?pid=1336082&dirx=-10.316&diry=0.618&dirz=-0.301" target="_blank">Acqua di Parma黑色玻璃瓶装香水</a></td>
+</tr>
+</table>
+
+<h2>自行车类 - BROMPTON</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>自行车类</th>
+<th>BROMPTON</th>
+<th>1336160</th>
+<th><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_b_7.jpg" target="_blank">后</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_f_7.jpg" target="_blank">前</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_l_7.jpg" target="_blank">左</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>Brompton绿色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 门口独立展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-17.787, -2.922, 0.008)<br><br>• <strong>名称</strong>: <strong>Brompton橙色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 门口独立展台（左侧）<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-19.858, -5.968, -0.063)<br><br>• <strong>名称</strong>: Brompton白色金属折叠自行车<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: Brompton红色金属折叠自行车<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 墙面层架（上层左）<br>• <strong>视图方向</strong>: 后</th>
+<th><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336160&dirx=-17.787&diry=-2.922&dirz=0.008" target="_blank">Brompton绿色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336160&dirx=-19.858&diry=-5.968&dirz=-0.063" target="_blank">Brompton橙色金属折叠自行车</a></th>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336165</td>
+<td><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_b_7.jpg" target="_blank">后</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_f_7.jpg" target="_blank">前</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_l_7.jpg" target="_blank">左</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Brompton橙色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-18.476, -0.447, -0.129)<br><br>• <strong>名称</strong>: <strong>Brompton黑色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-16.873, 1.911, 0.442)<br><br>• <strong>名称</strong>: 未知品牌绿色绗缝织物夹克<br>• <strong>类型</strong>: 绗缝夹克<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面网格<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 未知品牌红黑迷彩织物手提包<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 红、黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面网格<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336165&dirx=-18.476&diry=-0.447&dirz=-0.129" target="_blank">Brompton橙色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336165&dirx=-16.873&diry=1.911&dirz=0.442" target="_blank">Brompton黑色金属折叠自行车</a></td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336170</td>
+<td><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_b_7.jpg" target="_blank">后</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_f_7.jpg" target="_blank">前</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_l_7.jpg" target="_blank">左</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Brompton绿色折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-9.114, 2.047, 0.273)<br><br>• <strong>名称</strong>: <strong>Brompton黑色折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-8.92, 1.913, 0.386)<br><br>• <strong>名称</strong>: <strong>Brompton黑色折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-8.403, 1.689, 0.591)<br><br>• <strong>名称</strong>: Brompton黑色金属折叠自行车<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Brompton彩色织物包<br>• <strong>类型</strong>: 包<br>• <strong>颜色</strong>: 红、蓝、黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336170&dirx=-9.114&diry=2.047&dirz=0.273" target="_blank">Brompton绿色折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336170&dirx=-8.403&diry=1.689&dirz=0.591" target="_blank">Brompton黑色折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336170&dirx=-8.403&diry=1.689&dirz=0.591" target="_blank">Brompton黑色折叠自行车</a></td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336148</td>
+<td><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_b_7.jpg" target="_blank">后</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_f_7.jpg" target="_blank">前</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_l_7.jpg" target="_blank">左</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Brompton橙色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.8, 1.463, -0.316)<br><br>• <strong>名称</strong>: <strong>Brompton蓝色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 蓝<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-10.914, 1.088, 0.014)<br><br>• <strong>名称</strong>: <strong>人形模特深绿色织物夹克</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 夹克<br>• <strong>颜色</strong>: 深绿<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-7.363, -0.515, 0.664)<br><br>• <strong>名称</strong>: 墙面展示架绿色金属折叠自行车<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 墙面展示架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 墙面展示架紫色金属折叠自行车<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 紫<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 墙面展示架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336148&dirx=-10.8&diry=1.463&dirz=-0.316" target="_blank">Brompton橙色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336148&dirx=-10.914&diry=1.088&dirz=0.014" target="_blank">Brompton蓝色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336148&dirx=-7.363&diry=-0.515&dirz=0.664" target="_blank">人形模特深绿色织物夹克</a></td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336154</td>
+<td><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_b_7.jpg" target="_blank">后</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_f_7.jpg" target="_blank">前</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_l_7.jpg" target="_blank">左</a><br><a href="images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Brompton多色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑、灰、蓝<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-15.381, 0.783, -0.165)<br><br>• <strong>名称</strong>: <strong>Brompton绿色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-13.099, 2.764, 0.082)<br><br>• <strong>名称</strong>: <strong>Brompton黑色金属折叠自行车</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 折叠自行车<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-13.287, 2.781, 0.2)<br><br>• <strong>名称</strong>: Brompton红黑迷彩织物手提包<br>• <strong>类型</strong>: 手提包<br>• <strong>颜色</strong>: 红、黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Brompton绿色绗缝织物外套<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336154&dirx=-15.381&diry=0.783&dirz=-0.165" target="_blank">Brompton多色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336154&dirx=-12.309&diry=2.472&dirz=0.167" target="_blank">Brompton绿色金属折叠自行车</a><br><a href="https://vr.aibee.cn/store/N1vfzj3dO5rgiSJt?pid=1336154&dirx=-13.412&diry=2.783&dirz=0.116" target="_blank">Brompton黑色金属折叠自行车</a></td>
+</tr>
+</table>
+
+<h2>运动休闲类 - 安踏</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>运动休闲类</th>
+<th>安踏</th>
+<th>1348187</th>
+<th><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_15_b_7.jpg" target="_blank">后</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_15_f_7.jpg" target="_blank">前</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_15_l_7.jpg" target="_blank">左</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_15_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>安踏橙色织物双肩背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 双肩背包<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.021, -7.388, 0.787)<br><br>• <strong>名称</strong>: <strong>安踏绿色织物双肩背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 双肩背包<br>• <strong>颜色</strong>: 绿<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-0.984, -7.716, 0.787)<br><br>• <strong>名称</strong>: <strong>安踏黑色织物连帽外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 连帽外套<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-1.046, -7.281, 0.803)<br><br>• <strong>名称</strong>: 安踏紫色织物连帽外套<br>• <strong>类型</strong>: 连帽外套<br>• <strong>颜色</strong>: 紫<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 安踏白色织物连帽外套<br>• <strong>类型</strong>: 连帽外套<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后</th>
+<th><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348187&dirx=-1.021&diry=-7.388&dirz=0.787" target="_blank">安踏橙色织物双肩背包</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348187&dirx=-0.984&diry=-7.716&dirz=0.787" target="_blank">安踏绿色织物双肩背包</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348187&dirx=-3.202&diry=-9.766&dirz=0.693" target="_blank">安踏黑色织物连帽外套</a></th>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348198</td>
+<td><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_26_b_7.jpg" target="_blank">后</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_26_f_7.jpg" target="_blank">前</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_26_l_7.jpg" target="_blank">左</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_26_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>ANTA灰黑白色织物夹克</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 夹克<br>• <strong>颜色</strong>: 灰、黑、白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (0.181, -9.715, 0.248)<br><br>• <strong>名称</strong>: <strong>黑色织物双肩背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 双肩背包<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (0.315, -10.05, 0.586)<br><br>• <strong>名称</strong>: <strong>橙色织物双肩背包</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 双肩背包<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-3.546, -11.09, 0.727)<br><br>• <strong>名称</strong>: 黑色织物休闲裤<br>• <strong>类型</strong>: 休闲裤<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左<br><br>• <strong>名称</strong>: 卡其色织物休闲裤<br>• <strong>类型</strong>: 休闲裤<br>• <strong>颜色</strong>: 卡其<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 左</td>
+<td><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348198&dirx=0.181&diry=-9.715&dirz=0.248" target="_blank">ANTA灰黑白色织物夹克</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348198&dirx=-3.6&diry=-10.686&dirz=0.743" target="_blank">黑色织物双肩背包</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348198&dirx=-3.546&diry=-11.09&dirz=0.727" target="_blank">橙色织物双肩背包</a></td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348209</td>
+<td><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_37_b_7.jpg" target="_blank">后</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_37_f_7.jpg" target="_blank">前</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_37_l_7.jpg" target="_blank">左</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_37_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>白色连帽外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 连帽外套<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 人形模特<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (16.373, -14.482, 0.715)<br><br>• <strong>名称</strong>: <strong>黑橙黄织物外套</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 外套<br>• <strong>颜色</strong>: 黑、橙、黄<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 中央衣架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (16.366, -14.513, 0.151)<br><br>• <strong>名称</strong>: <strong>白色织物羽绒服</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物、羽绒<br>• <strong>位置</strong>: 中央衣架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (16.322, -13.473, 0.479)<br><br>• <strong>名称</strong>: 黑色带红标织物夹克<br>• <strong>类型</strong>: 夹克<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 墙面衣架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 白色织物羽绒服<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物、羽绒<br>• <strong>位置</strong>: 墙面衣架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348209&dirx=16.373&diry=-14.482&dirz=0.715" target="_blank">白色连帽外套</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348209&dirx=16.366&diry=-14.513&dirz=0.151" target="_blank">黑橙黄织物外套</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348209&dirx=16.322&diry=-13.473&dirz=0.479" target="_blank">白色织物羽绒服</a></td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348220</td>
+<td><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_48_b_7.jpg" target="_blank">后</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_48_f_7.jpg" target="_blank">前</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_48_l_7.jpg" target="_blank">左</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_48_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>安踏白色织物连帽羽绒服</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 连帽羽绒服<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 织物、羽绒<br>• <strong>位置</strong>: 中央衣架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (7.563, -9.056, -0.294)<br><br>• <strong>名称</strong>: <strong>安踏棕色织物羽绒服</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 织物、羽绒<br>• <strong>位置</strong>: 中央衣架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (7.668, -8.144, -0.05)<br><br>• <strong>名称</strong>: <strong>安踏黑色织物羽绒服</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 羽绒服<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物、羽绒<br>• <strong>位置</strong>: 右侧衣架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (7.457, -7.457, 0.175)</td>
+<td><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348220&dirx=7.563&diry=-9.056&dirz=-0.294" target="_blank">安踏白色织物连帽羽绒服</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348220&dirx=7.668&diry=-8.144&dirz=-0.05" target="_blank">安踏棕色织物羽绒服</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348220&dirx=7.457&diry=-7.457&dirz=0.175" target="_blank">安踏黑色织物羽绒服</a></td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348231</td>
+<td><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_59_b_7.jpg" target="_blank">后</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_59_f_7.jpg" target="_blank">前</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_59_l_7.jpg" target="_blank">左</a><br><a href="images/3f09567b0f0f41e4aa7abbf26b1725a7_59_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>安踏多色织物跑步鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 跑步鞋<br>• <strong>颜色</strong>: 白、黑、灰、粉、红、银<br>• <strong>材质</strong>: 织物、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (3.977, -11.544, 0.595)<br><br>• <strong>名称</strong>: <strong>安踏多色橡胶运动球</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 运动球<br>• <strong>颜色</strong>: 黑、紫、橙、白<br>• <strong>材质</strong>: 橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (4.11, -12.637, 0.225)<br><br>• <strong>名称</strong>: <strong>安踏多色金属球拍</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 球拍<br>• <strong>颜色</strong>: 银、黑<br>• <strong>材质</strong>: 金属、橡胶<br>• <strong>位置</strong>: 中央展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (4.083, -12.776, 0.437)<br><br>• <strong>名称</strong>: 卡其色织物风衣<br>• <strong>类型</strong>: 风衣<br>• <strong>颜色</strong>: 卡其<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 左侧衣架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 安踏黑色织物跑步鞋<br>• <strong>类型</strong>: 跑步鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 右</td>
+<td><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348231&dirx=3.977&diry=-11.544&dirz=0.595" target="_blank">安踏多色织物跑步鞋</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348231&dirx=4.11&diry=-12.637&dirz=0.225" target="_blank">安踏多色橡胶运动球</a><br><a href="https://vr.aibee.cn/store/iaLmwKGtFquzmC5d?pid=1348231&dirx=4.083&diry=-12.776&dirz=0.437" target="_blank">安踏多色金属球拍</a></td>
+</tr>
+</table>
+
+<h2>鞋履类 - BIRKENSTOCK</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>鞋履类</th>
+<th>BIRKENSTOCK</th>
+<th>1332458</th>
+<th><a href="images/3c22fc7144cd49b8b7508af648e8955f_10_b_7.jpg" target="_blank">后</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_10_f_7.jpg" target="_blank">前</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_10_l_7.jpg" target="_blank">左</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>德国传统品牌棕色皮革休闲鞋（展示柜）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央展台（展示柜）<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-7.964, -1.77, 0.239)<br><br>• <strong>名称</strong>: <strong>德国传统品牌黑色皮革休闲鞋（中央小桌）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央小桌<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-6.333, -0.32, -0.033)<br><br>• <strong>名称</strong>: <strong>德国传统品牌棕色皮革休闲鞋（中央小桌）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央小桌<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-6.303, -0.198, -0.069)<br><br>• <strong>名称</strong>: 德国传统品牌黑色皮革休闲鞋<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: 德国传统品牌棕色皮革休闲鞋<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</th>
+<th><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332458&dirx=-7.964&diry=-1.77&dirz=0.239" target="_blank">德国传统品牌棕色皮革休闲鞋（展示柜）</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332458&dirx=-6.333&diry=-0.32&dirz=-0.033" target="_blank">德国传统品牌黑色皮革休闲鞋（中央小桌）</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332458&dirx=-6.303&diry=-0.198&dirz=-0.069" target="_blank">德国传统品牌棕色皮革休闲鞋（中央小桌）</a></th>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332460</td>
+<td><a href="images/3c22fc7144cd49b8b7508af648e8955f_12_b_7.jpg" target="_blank">后</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_12_f_7.jpg" target="_blank">前</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_12_l_7.jpg" target="_blank">左</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_12_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>休闲鞋白色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 门口展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-11.333, -0.16, 0.234)<br><br>• <strong>名称</strong>: <strong>休闲鞋蓝色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 蓝<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 门口展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-11.121, -0.294, 0.267)<br><br>• <strong>名称</strong>: <strong>休闲鞋红色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 红<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 门口展台<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-10.864, -0.413, 0.234)<br><br>• <strong>名称</strong>: Birkenstock黑色皮革穆勒鞋<br>• <strong>类型</strong>: 穆勒鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: Birkenstock灰色皮革穆勒鞋<br>• <strong>类型</strong>: 穆勒鞋<br>• <strong>颜色</strong>: 灰<br>• <strong>材质</strong>: 皮革、橡胶<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332460&dirx=-11.333&diry=-0.16&dirz=0.234" target="_blank">休闲鞋白色皮革休闲鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332460&dirx=-11.121&diry=-0.294&dirz=0.267" target="_blank">休闲鞋蓝色皮革休闲鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332460&dirx=-10.864&diry=-0.413&dirz=0.234" target="_blank">休闲鞋红色皮革休闲鞋</a></td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332461</td>
+<td><a href="images/3c22fc7144cd49b8b7508af648e8955f_13_b_7.jpg" target="_blank">后</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_13_f_7.jpg" target="_blank">前</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_13_l_7.jpg" target="_blank">左</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_13_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Birkenstock黑色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧小桌子<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.544, -0.688, 0.098)<br><br>• <strong>名称</strong>: <strong>Birkenstock棕色皮革皮鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 皮鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央玻璃展台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.363, 0.259, 0.265)<br><br>• <strong>名称</strong>: <strong>Birkenstock多色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑、棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央圆形展台<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-12.156, 2.139, 0.33)<br><br>• <strong>名称</strong>: Birkenstock黑色毛绒凉鞋<br>• <strong>类型</strong>: 凉鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 毛绒、皮革<br>• <strong>位置</strong>: 墙面层架（b视角）<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: Birkenstock白色皮革带扣凉鞋<br>• <strong>类型</strong>: 凉鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 皮革、软木<br>• <strong>位置</strong>: 墙面层架（b视角）<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332461&dirx=-10.544&diry=-0.688&dirz=0.098" target="_blank">Birkenstock黑色皮革休闲鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332461&dirx=-10.363&diry=0.259&dirz=0.265" target="_blank">Birkenstock棕色皮革皮鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332461&dirx=-12.156&diry=2.139&dirz=0.33" target="_blank">Birkenstock多色皮革休闲鞋</a></td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332462</td>
+<td><a href="images/3c22fc7144cd49b8b7508af648e8955f_14_b_7.jpg" target="_blank">后</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_14_f_7.jpg" target="_blank">前</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_14_l_7.jpg" target="_blank">左</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_14_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Birkenstock棕色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧玻璃展柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.571, -2.774, 0.088)<br><br>• <strong>名称</strong>: <strong>Birkenstock黑色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧玻璃展柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.429, -2.548, 0.139)<br><br>• <strong>名称</strong>: <strong>Birkenstock棕色皮革凉鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 凉鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 中央玻璃展柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.211, -1.896, -0.389)<br><br>• <strong>名称</strong>: Birkenstock黑色皮革皮鞋<br>• <strong>类型</strong>: 皮鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: Birkenstock黑色织物休闲鞋<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 织物<br>• <strong>位置</strong>: 收银台旁展示桌<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332462&dirx=-10.571&diry=-2.774&dirz=0.088" target="_blank">Birkenstock棕色皮革休闲鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332462&dirx=-10.429&diry=-2.548&dirz=0.139" target="_blank">Birkenstock黑色皮革休闲鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332462&dirx=-11.938&diry=0.386&dirz=-0.177" target="_blank">Birkenstock棕色皮革凉鞋</a></td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332463</td>
+<td><a href="images/3c22fc7144cd49b8b7508af648e8955f_15_b_7.jpg" target="_blank">后</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_15_f_7.jpg" target="_blank">前</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_15_l_7.jpg" target="_blank">左</a><br><a href="images/3c22fc7144cd49b8b7508af648e8955f_15_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>Birkenstock棕色皮革皮鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 皮鞋<br>• <strong>颜色</strong>: 棕<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧玻璃展柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-10.057, -3.683, 0.138)<br><br>• <strong>名称</strong>: <strong>Birkenstock黑色皮革皮鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 皮鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 左侧玻璃展柜<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-9.949, -3.469, 0.165)<br><br>• <strong>名称</strong>: <strong>Birkenstock黑色皮革休闲鞋</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 休闲鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 右侧小桌子上层<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-9.934, -1.918, 0.145)<br><br>• <strong>名称</strong>: Birkenstock白色皮革高跟鞋<br>• <strong>类型</strong>: 高跟鞋<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后<br><br>• <strong>名称</strong>: Birkenstock黑色皮革运动鞋<br>• <strong>类型</strong>: 运动鞋<br>• <strong>颜色</strong>: 黑<br>• <strong>材质</strong>: 皮革<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 后</td>
+<td><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332463&dirx=-10.057&diry=-3.683&dirz=0.138" target="_blank">Birkenstock棕色皮革皮鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332463&dirx=-9.949&diry=-3.469&dirz=0.165" target="_blank">Birkenstock黑色皮革皮鞋</a><br><a href="https://vr.aibee.cn/store/rnigHTJW6gZ1WvN8?pid=1332463&dirx=-9.97&diry=-1.836&dirz=-0.141" target="_blank">Birkenstock黑色皮革休闲鞋</a></td>
+</tr>
+</table>
+
+<h2>餐饮类 - O'eat</h2>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>商品信息</th>
+<th>VR链接</th>
+</tr>
+<tr>
+<th>餐饮类</th>
+<th>O'eat</th>
+<th>1347725</th>
+<th><a href="images/23a3b26aa55945b8b151b39ecc095e71_10_b_7.jpg" target="_blank">后</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_10_f_7.jpg" target="_blank">前</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_10_l_7.jpg" target="_blank">左</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_10_r_7.jpg" target="_blank">右</a></th>
+<th>• <strong>名称</strong>: <strong>未知品牌瓶装饮料</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 瓶装饮料<br>• <strong>颜色</strong>: 绿、红、白、黄<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 吧台后墙面层架<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-8.393, -10.892, 0.963)<br><br>• <strong>名称</strong>: <strong>未知品牌不锈钢咖啡器具（咖啡机/奶泡器）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 咖啡器具（咖啡机/奶泡器）<br>• <strong>颜色</strong>: 银、黑<br>• <strong>材质</strong>: 不锈钢、塑料<br>• <strong>位置</strong>: 吧台台面<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-8.52, -10.537, 0.537)<br><br>• <strong>名称</strong>: <strong>未知品牌葡萄酒瓶（含葡萄酒）</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 葡萄酒瓶<br>• <strong>颜色</strong>: 透明、白、红、黄<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 中央岛台层架<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-6.677, -8.042, 1.092)<br><br>• <strong>名称</strong>: 未知品牌葡萄酒瓶（含葡萄酒）<br>• <strong>类型</strong>: 葡萄酒瓶<br>• <strong>颜色</strong>: 白、红、黑、透明<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架（图1）<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 未知品牌腌制罐（含腌制品）<br>• <strong>类型</strong>: 腌制罐<br>• <strong>颜色</strong>: 红、棕、透明<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架（图3）<br>• <strong>视图方向</strong>: 左</th>
+<th><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347725&dirx=-8.393&diry=-10.892&dirz=0.963" target="_blank">未知品牌瓶装饮料</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347725&dirx=-8.52&diry=-10.537&dirz=0.537" target="_blank">未知品牌不锈钢咖啡器具（咖啡机/奶泡器）</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347725&dirx=-6.677&diry=-8.042&dirz=1.092" target="_blank">未知品牌葡萄酒瓶（含葡萄酒）</a></th>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347730</td>
+<td><a href="images/23a3b26aa55945b8b151b39ecc095e71_15_b_7.jpg" target="_blank">后</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_15_f_7.jpg" target="_blank">前</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_15_l_7.jpg" target="_blank">左</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_15_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>弧形层架葡萄酒瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 葡萄酒瓶<br>• <strong>颜色</strong>: 白、红、黑<br>• <strong>材质</strong>: 玻璃、纸质<br>• <strong>位置</strong>: 弧形层架（左侧）<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-12.037, -5.753, 1.535)<br><br>• <strong>名称</strong>: 透明玻璃罐<br>• <strong>类型</strong>: 玻璃罐<br>• <strong>颜色</strong>: 透明<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架（左侧）<br>• <strong>视图方向</strong>: 前<br><br>• <strong>名称</strong>: 带红色液体的玻璃罐<br>• <strong>类型</strong>: 玻璃罐<br>• <strong>颜色</strong>: 透明、红<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架（中间）<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347730&dirx=-12.037&diry=-5.753&dirz=1.535" target="_blank">弧形层架葡萄酒瓶</a></td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347735</td>
+<td><a href="images/23a3b26aa55945b8b151b39ecc095e71_20_b_7.jpg" target="_blank">后</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_20_f_7.jpg" target="_blank">前</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_20_l_7.jpg" target="_blank">左</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_20_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>多品牌多色玻璃酒瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 酒瓶<br>• <strong>颜色</strong>: 透明、白、绿、蓝、棕<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 圆柱形酒架（中上层）<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-4.081, -3.098, 1.473)<br><br>• <strong>名称</strong>: <strong>无品牌粉色毛绒玩偶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 玩偶<br>• <strong>颜色</strong>: 粉<br>• <strong>材质</strong>: 毛绒<br>• <strong>位置</strong>: 餐厅内木质桌台（绿色立柱旁）<br>• <strong>视图方向</strong>: 左<br>• <strong>3D坐标</strong>: (-5.071, -4.247, 0.049)<br><br>• <strong>名称</strong>: <strong>无品牌绿色植物盆栽</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 植物盆栽<br>• <strong>颜色</strong>: 绿、灰<br>• <strong>材质</strong>: 植物（活）、陶瓷<br>• <strong>位置</strong>: 商场走廊（餐厅出口左侧）<br>• <strong>视图方向</strong>: 右<br>• <strong>3D坐标</strong>: (-5.001, -0.72, 0.463)</td>
+<td><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347735&dirx=-4.081&diry=-3.098&dirz=1.473" target="_blank">多品牌多色玻璃酒瓶</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347735&dirx=-5.071&diry=-4.247&dirz=0.049" target="_blank">无品牌粉色毛绒玩偶</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347735&dirx=-5.001&diry=-0.72&dirz=0.463" target="_blank">无品牌绿色植物盆栽</a></td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347739</td>
+<td><a href="images/23a3b26aa55945b8b151b39ecc095e71_24_b_7.jpg" target="_blank">后</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_24_f_7.jpg" target="_blank">前</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_24_l_7.jpg" target="_blank">左</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_24_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>餐厅用白色陶瓷盘子</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 盘子<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 陶瓷<br>• <strong>位置</strong>: 服务推车<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-16.444, -1.573, 0.193)<br><br>• <strong>名称</strong>: <strong>餐厅用银色金属调料罐</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 调料罐<br>• <strong>颜色</strong>: 银<br>• <strong>材质</strong>: 金属<br>• <strong>位置</strong>: 服务推车<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-16.504, -1.313, 0.243)<br><br>• <strong>名称</strong>: <strong>O'eat餐厅白色塑料婴儿餐椅</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 婴儿餐椅<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 餐厅入口旁<br>• <strong>视图方向</strong>: 后<br>• <strong>3D坐标</strong>: (-19.981, -3.136, 0.143)<br><br>• <strong>名称</strong>: 餐厅用橙色玻璃烛台<br>• <strong>类型</strong>: 烛台<br>• <strong>颜色</strong>: 橙<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 餐桌<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347739&dirx=-16.444&diry=-1.573&dirz=0.193" target="_blank">餐厅用白色陶瓷盘子</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347739&dirx=-16.504&diry=-1.313&dirz=0.243" target="_blank">餐厅用银色金属调料罐</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347739&dirx=-19.981&diry=-3.136&dirz=0.143" target="_blank">O'eat餐厅白色塑料婴儿餐椅</a></td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347721</td>
+<td><a href="images/23a3b26aa55945b8b151b39ecc095e71_6_b_7.jpg" target="_blank">后</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_6_f_7.jpg" target="_blank">前</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_6_l_7.jpg" target="_blank">左</a><br><a href="images/23a3b26aa55945b8b151b39ecc095e71_6_r_7.jpg" target="_blank">右</a></td>
+<td>• <strong>名称</strong>: <strong>专业白色金属意式咖啡机</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 意式咖啡机<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 金属、塑料<br>• <strong>位置</strong>: 吧台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-0.44, -8.739, 0.45)<br><br>• <strong>名称</strong>: <strong>无品牌蓝白花纹陶瓷盘子</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 盘子<br>• <strong>颜色</strong>: 蓝、白<br>• <strong>材质</strong>: 陶瓷<br>• <strong>位置</strong>: 吧台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-0.641, -9.164, -0.352)<br><br>• <strong>名称</strong>: <strong>无品牌白色塑料喷雾瓶</strong> ⭐ (推荐)<br>• <strong>类型</strong>: 清洁喷雾瓶<br>• <strong>颜色</strong>: 白<br>• <strong>材质</strong>: 塑料<br>• <strong>位置</strong>: 吧台<br>• <strong>视图方向</strong>: 前<br>• <strong>3D坐标</strong>: (-0.426, -8.694, 0.002)<br><br>• <strong>名称</strong>: 无品牌红色标签玻璃小酒瓶<br>• <strong>类型</strong>: 酒瓶<br>• <strong>颜色</strong>: 红、透明<br>• <strong>材质</strong>: 玻璃<br>• <strong>位置</strong>: 墙面层架<br>• <strong>视图方向</strong>: 前</td>
+<td><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347721&dirx=-0.44&diry=-8.739&dirz=0.45" target="_blank">专业白色金属意式咖啡机</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347721&dirx=-0.641&diry=-9.164&dirz=-0.352" target="_blank">无品牌蓝白花纹陶瓷盘子</a><br><a href="https://vr.aibee.cn/store/RnbLw8dT9JWulKP3?pid=1347721&dirx=-0.426&diry=-8.694&dirz=0.002" target="_blank">无品牌白色塑料喷雾瓶</a></td>
+</tr>
+</table>
+
+
+<h1>第二部分：店铺分析（精简版）</h1>
+
+<p>本部分展示精简版本：每个类别选择一个店铺，每个店铺选择5个点位。</p>
+
+
+<h2>家居用品类 - 睿锦尚品</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>家居用品类</th>
+<th>睿锦尚品</th>
+<th>1339861</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_25_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_25_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_25_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_25_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 奢侈品（时尚成衣/鞋履/配饰/箱包）<br><strong>价格定位</strong>: 高端<br><strong>目标客户</strong>: 潮流青年、高端时尚追求者、奢侈品爱好者、轻奢生活追求者<br><strong>风格</strong>: 现代简约、精致奢华、冷色调、时尚大气<br><strong>照明</strong>: 冷光均匀照明，分区聚焦（成衣区/鞋履区高光突出，通道柔和过渡，月球装置区氛围照明）<br><strong>空间布局</strong>: 开放式布局，成衣区（金属挂杆陈列）、鞋履区（墙面层架/玻璃层架展示）、配饰/箱包区（中央货架陈列）、特色月球装置展示区功能分区明确，动线流畅无视觉阻碍<br><strong>整体感觉</strong>: 精致奢华与潮流活力融合，冷调空间凸显商品质感，月球装置增添潮流氛围，整体时尚大气<br><strong>陈列方式</strong>:<br>  - 金属挂杆分区陈列成衣（按风格/品类）<br>  - 墙面层架分层展示鞋履<br>  - 人形模特动态演绎成衣搭配（如KENZO卫衣+长裤）<br>  - 中央货架陈列配饰/箱包（如GUCCI图案围巾）<br>  - 玻璃层架透明展示鞋履<br>  - 月球装置区场景化陈列潮流商品</th>
+</tr>
+<tr>
+<td>家居用品类</td>
+<td>睿锦尚品</td>
+<td>1339868</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_32_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_32_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_32_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_32_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>家居用品类</td>
+<td>睿锦尚品</td>
+<td>1339876</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_40_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_40_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_40_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/睿锦尚品/images/685c720f09614b06a27efccb174e1a70_40_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>时尚服饰类 - 13DEMARZO</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>时尚服饰类</th>
+<th>13DEMARZO</th>
+<th>1339628</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_4_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_4_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_4_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_4_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 时尚成衣（服饰/配饰/鞋履）<br><strong>价格定位</strong>: 轻奢<br><strong>目标客户</strong>: 潮流青年、轻奢生活追求者、可爱风服饰爱好者<br><strong>风格</strong>: 现代简约、暖色调、精致、可爱风<br><strong>照明</strong>: 暖光柔和铺陈，成衣区/配饰区重点照明突出商品，通道过渡自然<br><strong>空间布局</strong>: 开放式布局，成衣陈列区（墙面挂杆+移动衣架）、配饰收银区（玻璃柜台）、休息打卡区功能分区清晰，动线流畅无视觉阻碍<br><strong>整体感觉</strong>: 温暖精致的时尚空间，可爱玩偶元素增添活力，潮流设计与柔和氛围融合<br><strong>陈列方式</strong>:<br>  - 墙面挂杆分类陈列成衣（按风格/色系）<br>  - 玻璃柜台陈列配饰（珠宝/小饰品）<br>  - 台面陈列小件（帽子/玩偶/鞋履）<br>  - 移动衣架陈列特色成衣</th>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339629</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_5_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_5_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_5_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_5_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339630</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_6_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_6_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_6_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_6_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339631</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_7_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_7_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_7_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_7_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>时尚服饰类</td>
+<td>13DEMARZO</td>
+<td>1339632</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_8_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_8_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_8_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/13DEMARZO/images/3ec665f5375f498db3e4125001fc567b_8_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>珠宝首饰类 - BVLGARI</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>珠宝首饰类</th>
+<th>BVLGARI</th>
+<th>1333526</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_1_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_1_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_1_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_1_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 奢侈品（香氛/美妆）<br><strong>价格定位</strong>: 高端<br><strong>目标客户</strong>: 高端消费群体、奢侈品爱好者、香氛收藏家、精致生活追求者<br><strong>风格</strong>: 现代奢华、暖色调、精致、高端大气、艺术感陈列<br><strong>照明</strong>: 暖光氤氲，商品区高光聚焦（香水瓶/礼盒细节突出），环境区柔和过渡<br><strong>空间布局</strong>: 开放式布局，以中岛台+墙面陈列为主，动线流畅，视觉焦点集中于香氛展示区<br><strong>整体感觉</strong>: 奢华精致，意式美学与嗅觉艺术融合，尊贵感中透着细腻的香氛文化氛围<br><strong>陈列方式</strong>:<br>  - 墙面嵌入式灯箱陈列BVLGARI礼盒<br>  - 圆形灯箱+背光展示香水瓶<br>  - 中岛台陈列香水小样/套装<br>  - 墙面海报展示主打香水系列<br>  - 柜台分层陈列多系列香水</th>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333528</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_2_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_2_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_2_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_2_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333529</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_3_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_3_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_3_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_3_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333531</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_4_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_4_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_4_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_4_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>珠宝首饰类</td>
+<td>BVLGARI</td>
+<td>1333533</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_5_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_5_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_5_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BVLGARI/images/b394910f42024154b01980b216266ea9_5_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>箱包类 - BALLY</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>箱包类</th>
+<th>BALLY</th>
+<th>1339696</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_5_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_5_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_5_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_5_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 奢侈品（时尚配饰/箱包/成衣/鞋履）<br><strong>价格定位</strong>: 高端<br><strong>目标客户</strong>: 商务精英、轻奢生活追求者、高端时尚爱好者、品质消费人群<br><strong>风格</strong>: 现代简约、暖色调、精致奢华、木质温润、空间开阔<br><strong>照明</strong>: 暖光氤氲，分区聚焦照明（手袋、鞋履、成衣区高光突出商品质感，通道区域柔和过渡保障动线舒适）<br><strong>空间布局</strong>: 开放式布局，手袋、成衣、鞋履、配饰专区功能分区明确，中央立柱区域陈列箱包，墙面层架与中央岛台结合展示商品，动线流畅无视觉阻碍<br><strong>整体感觉</strong>: 尊贵精致与时尚活力交融，暖光烘托出奢华氛围，商品陈列尽显高端质感，整体氛围兼具商务优雅与潮流张力<br><strong>陈列方式</strong>:<br>  - 墙面木质层架分层展示鞋履、手袋<br>  - 中央木质/玻璃岛台陈列鞋履、手袋及配饰<br>  - 人形模特动态演绎成衣搭配<br>  - 金属质感层架陈列手袋<br>  - 玻璃架陈列鞋履与手袋<br><strong>有试穿区</strong>: 是<br><strong>有拍照点</strong>: 否</th>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339699</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_6_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_6_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_6_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_6_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339705</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_8_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_8_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_8_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_8_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339708</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_9_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_9_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_9_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_9_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>箱包类</td>
+<td>BALLY</td>
+<td>1339711</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_10_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_10_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_10_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BALLY/images/50c21999a9b5430f957411a2e830b353_10_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>美妆护肤类 - ACQUADIPARMA</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>美妆护肤类</th>
+<th>ACQUADIPARMA</th>
+<th>1336079</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_2_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_2_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_2_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_2_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 高端香氛（香水、香薰、护理品）<br><strong>价格定位</strong>: 高端<br><strong>目标客户</strong>: 香氛爱好者、轻奢生活追求者、精致生活人群、高端消费群体<br><strong>风格</strong>: 暖色调、现代精致、轻奢优雅、复古质感<br><strong>照明</strong>: 暖光为主，层架内置灯带聚焦商品展示，整体空间暖光氤氲，商品区高光突出，通道柔和过渡<br><strong>空间布局</strong>: 开放式布局，功能分区明确（香氛展示区、中央中岛体验区、试用区、休息区），动线流畅，货架与中岛结合，空间利用合理<br><strong>整体感觉</strong>: 暖色调与木质感营造温馨精致氛围，轻奢优雅中传递意式高端香氛美学<br><strong>陈列方式</strong>:<br>  - 中央白色中岛分层陈列香水瓶（多色）<br>  - 墙面层架分层展示黄色礼盒、大瓶香氛<br>  - 红色内嵌柜展示陶瓷瓶与护理品<br>  - 层架分区展示小瓶香水、香薰蜡烛、护理产品</th>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336080</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_3_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_3_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_3_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_3_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336081</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_4_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_4_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_4_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_4_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336082</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_5_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_5_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_5_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_5_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>美妆护肤类</td>
+<td>ACQUADIPARMA</td>
+<td>1336083</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_6_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_6_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_6_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/ACQUADIPARMA/images/0abccefc7d3044559694451b3b1ef3a8_6_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>自行车类 - BROMPTON</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>自行车类</th>
+<th>BROMPTON</th>
+<th>1336148</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_4_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 自行车及骑行周边（折叠自行车、骑行服饰、配饰）<br><strong>价格定位</strong>: 高端<br><strong>目标客户</strong>: 城市通勤族、骑行爱好者、品质生活追求者<br><strong>风格</strong>: 现代简约、精致、都市活力<br><strong>照明</strong>: 冷光为主，分区聚焦照明（自行车陈列区高光突出，周边商品区柔和过渡，整体明亮通透）<br><strong>空间布局</strong>: 开放式布局，自行车陈列区（墙面格架、中央展示台）、骑行周边区（墙面网格架）、休息区（长椅+绿植）功能分区明确，动线流畅无视觉阻碍<br><strong>整体感觉</strong>: 都市精致感与骑行活力交融，空间明亮有序，科技感与自然元素（绿植）平衡，营造专业且舒适的骑行生活体验空间<br><strong>陈列方式</strong>:<br>  - 墙面格架（黑白/白色）分层展示折叠自行车（内置灯光）<br>  - 墙面网格架悬挂展示骑行服饰/包袋<br>  - 中央展示台陈列特色自行车<br>  - 层架摆放骑行配饰（坐垫、配件）<br>  - 电子屏动态展示骑行场景<br><strong>有试穿区</strong>: 是<br><strong>有拍照点</strong>: 是</th>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336154</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_7_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336160</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_10_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336165</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_12_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>自行车类</td>
+<td>BROMPTON</td>
+<td>1336170</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BROMPTON/images/399c1a7ece6a4eb8808c33a8d7c71dcc_15_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>运动休闲类 - 安踏</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>运动休闲类</th>
+<th>安踏</th>
+<th>1348187</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_15_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_15_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_15_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_15_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 运动服饰（鞋履/成衣/运动配饰/户外装备）<br><strong>价格定位</strong>: 大众<br><strong>目标客户</strong>: 运动爱好者、潮流青年、家庭消费群体、户外出行人群<br><strong>风格</strong>: 现代简约、科技感、活力时尚、运动风<br><strong>照明</strong>: 冷光为主，商品陈列区（鞋履墙、成衣挂架、模特区）聚焦照明，通道光线柔和均匀，突出商品色彩与质感，营造科技感运动氛围<br><strong>空间布局</strong>: 开放式布局，鞋履墙、成衣挂架区、配饰陈列区、户外主题模特区功能分区清晰，动线流畅，视觉通透无阻碍，模特展示与商品陈列有机结合，增强场景代入感<br><strong>整体感觉</strong>: 活力时尚的运动科技氛围，现代简约的装修风格与鲜明的商品色彩、专业的运动装备碰撞，传递专业运动与潮流生活的融合体验<br><strong>陈列方式</strong>:<br>  - 人形模特动态演绎运动穿搭（含背包、户外装备，传递场景化搭配）<br>  - 墙面金属层架分层展示多系列鞋履（按品类/配色分区，视觉清晰）<br>  - 中央挂架陈列成衣（外套、卫衣、裤子等，按色系/品类集中陈列）<br>  - 层架展示运动配饰（滑板、帽子、背包）与运动器材（球拍、球具）<br>  - 主题场景陈列（如户外风暴甲系列模特区，搭配绿植、岩石道具，强化户外属性）<br><strong>有试穿区</strong>: 是<br><strong>有拍照点</strong>: 是</th>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348198</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_26_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_26_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_26_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_26_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348209</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_37_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_37_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_37_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_37_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348220</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_48_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_48_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_48_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_48_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>运动休闲类</td>
+<td>安踏</td>
+<td>1348231</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_59_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_59_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_59_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/安踏/images/3f09567b0f0f41e4aa7abbf26b1725a7_59_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>鞋履类 - BIRKENSTOCK</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>鞋履类</th>
+<th>BIRKENSTOCK</th>
+<th>1332454</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_6_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_6_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_6_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_6_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 鞋履（时尚鞋履）<br><strong>价格定位</strong>: 轻奢<br><strong>目标客户</strong>: 追求舒适时尚的都市人群、轻奢生活追求者、鞋履设计爱好者<br><strong>风格</strong>: 现代简约、暖色调、自然精致、轻奢风<br><strong>照明</strong>: 暖光为主，分区聚焦照明（鞋履陈列区高光突出商品细节，通道及休息区光线柔和提升舒适感）<br><strong>空间布局</strong>: 开放式布局，鞋履陈列区（墙面层架区、中央玻璃岛台区、木质中岛台区）功能分区明确，动线流畅无视觉阻碍，自然植物元素（悬挂绿植、盆栽）点缀增强空间放松感<br><strong>整体感觉</strong>: 舒适自然与轻奢时尚深度融合，精致鞋履陈列中洋溢生活美学张力，自然元素与暖光氛围共同营造放松惬意的购物环境<br><strong>陈列方式</strong>:<br>  - 中央玻璃岛台陈列特色鞋履<br>  - 墙面铜色金属层架分层展示多款式鞋履<br>  - 木质中岛桌展示主推鞋履<br>  - 自然植物（悬挂绿植、盆栽）点缀陈列区提升空间质感<br><strong>有试穿区</strong>: 是<br><strong>有拍照点</strong>: 是</th>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332455</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_7_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_7_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_7_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_7_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332456</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_8_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_8_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_8_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_8_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332457</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_9_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_9_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_9_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_9_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>鞋履类</td>
+<td>BIRKENSTOCK</td>
+<td>1332458</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_10_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_10_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_10_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/BIRKENSTOCK/images/3c22fc7144cd49b8b7508af648e8955f_10_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+
+<h2>餐饮类 - O'eat</h2>
+
+
+<h4>店铺点位信息</h4>
+
+<table class="data-table">
+<tr>
+<th>店铺分类</th>
+<th>店铺名称</th>
+<th>店铺点位</th>
+<th>点位图片</th>
+<th>店铺信息</th>
+</tr>
+<tr>
+<th>餐饮类</th>
+<th>O'eat</th>
+<th>1347721</th>
+<th><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_6_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_6_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_6_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_6_r.jpg" target="_blank">右</a></th>
+<th><strong>店铺类别</strong>: 餐饮（意式休闲简餐/西餐）<br><strong>价格定位</strong>: 轻奢休闲<br><strong>目标客户</strong>: 都市白领、休闲餐叙人群、葡萄酒爱好者<br><strong>风格</strong>: 复古工业风、暖色调、休闲精致、绿植点缀、木质元素<br><strong>照明</strong>: 暖光柔和，酒架区层架灯聚焦照明，餐区吊灯+环境光营造惬意氛围，操作区吊灯明亮实用<br><strong>空间布局</strong>: 开放式布局，酒水区（木质层架陈列酒）、餐区（卡座、圆桌、长桌，结合商场中庭景观位）、操作区（吧台/厨房+饮品陈列区）功能分区，动线流畅，景观与室内空间融合<br><strong>整体感觉</strong>: 复古休闲与精致惬意交织，暖光、绿植、木质元素营造舒适餐叙氛围，商场中庭景观增添开阔感<br><strong>陈列方式</strong>:<br>  - 木质层架灯光陈列葡萄酒（分区展示品类）<br>  - 操作区金属支架+木质层架陈列饮品（按品类分层）<br>  - 中央柱体弧形金属酒架环绕陈列葡萄酒+绿植点缀<br>  - 餐区桌面简约陈列（花瓶、餐具）<br><strong>有试穿区</strong>: 否<br><strong>有拍照点</strong>: 是</th>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347725</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_10_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_10_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_10_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_10_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347730</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_15_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_15_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_15_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_15_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347735</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_20_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_20_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_20_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_20_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+<tr>
+<td>餐饮类</td>
+<td>O'eat</td>
+<td>1347739</td>
+<td><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_24_b.jpg" target="_blank">后</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_24_f.jpg" target="_blank">前</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_24_l.jpg" target="_blank">左</a><br><a href="C:/Users/wyz/Desktop/dev-2025/python-practice/vr_pic_to_prod/panorama_json/O'eat/images/23a3b26aa55945b8b151b39ecc095e71_24_r.jpg" target="_blank">右</a></td>
+<td>-</td>
+</tr>
+</table>
+</body>
+</html>
