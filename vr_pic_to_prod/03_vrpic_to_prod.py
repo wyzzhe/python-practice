@@ -11,8 +11,10 @@ import json
 import base64
 import argparse
 import math
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Optional
-from tqdm import tqdm
+# from tqdm import tqdm
 from openai import OpenAI
 
 # 导入提示词
@@ -41,7 +43,7 @@ DOUBAO_BASE_URL = os.getenv(
 DOUBAO_MODEL = os.getenv('DOUBAO_MODEL', 'doubao-seed-1-6-vision-250815')
 
 # 并发配置
-MAX_WORKERS = 3  # 视觉模型较慢，建议设置较小的并发数
+MAX_WORKERS = 5  # 并发分析点位：每次请求 5 个点
 TIMEOUT = 10000  # API 超时时间（秒），传入多张图片需要更长时间
 
 
@@ -202,14 +204,13 @@ def calculate_product_3d_position(
     # 最终的水平角度
     final_angle = base_angle + horizontal_offset
     
-    # 计算3D坐标（相对于点位）
-    # 水平方向的距离分量
-    dx = estimated_distance * math.cos(final_angle)
-    dy = estimated_distance * math.sin(final_angle)
+    # 按 prompt 坐标系计算3D坐标（X:左右, Y:上下, Z:前后）
+    # 水平面分量（X-Z 平面）
+    dx = estimated_distance * math.sin(final_angle)  # 水平角在 X 轴的投影
+    dz = estimated_distance * math.cos(final_angle)  # 水平角在 Z 轴的投影（f 对应 +Z）
     
-    # 垂直方向（z轴），考虑垂直角度偏移
-    # 假设相机高度约1.6米（人眼高度）
-    dz = -estimated_distance * math.tan(vertical_offset)
+    # 垂直分量影响 Y 轴（上正下负），图像 y 越大越靠下，因此取负号
+    dy = -estimated_distance * math.tan(vertical_offset)
     
     # 计算最终的绝对坐标
     product_x = point_coord.get('position_x', 0) + dx
@@ -666,6 +667,7 @@ def process_brand(
     brand_folder: str,
     api_key: str,
     base_url: str,
+    output_dir: Optional[str] = None,
     vr_loc_list: Optional[List[int]] = None,
     max_product_points: int = 10,
     max_store_points: int = 10
@@ -737,75 +739,106 @@ def process_brand(
     print(f'  - 商品分析点位: {len(product_seq_ids)} 个 {product_seq_ids}')
     print(f'  - 店铺分析点位: {len(store_seq_ids)} 个 {store_seq_ids}')
     
-    # ========== 第一阶段：按点位分析商品 ==========
-    print('[INFO] 第一阶段：分析各点位商品...')
+    # ========== 第一阶段：按点位分析商品（并发 + 增量写入） ==========
+    print('[INFO] 第一阶段：分析各点位商品（并发 5）...')
     
-    product_results = []
-    store_point_images = []  # 收集店铺分析的点位图片
+    product_results: List[Dict] = []
+    store_point_images: List[Dict] = []  # 收集店铺分析的点位图片
     success_count = 0
     fail_count = 0
+    write_lock = threading.Lock()
     
-    for panorama_key, panorama_data in tqdm(panorama_groups.items(), desc=f'{brand_name}-商品'):
+    # 预先建立 seq_id -> (images, panorama_id) 映射，便于任务函数使用
+    seq_to_data: Dict[int, Dict] = {}
+    for panorama_key, panorama_data in panorama_groups.items():
         seq_id = panorama_data['seq_id']
         image_paths = panorama_data['images']
-        
-        # 只处理选中的商品分析点位
-        if seq_id not in product_seq_ids:
-            continue
-        
-        # 获取 panorama_id
         panorama_id_value = coordinates.get(seq_id, {}).get('id', seq_id)
-        
-        # 调用商品分析 API（使用 vr_product_prompt）
+        seq_to_data[seq_id] = {
+            'images': image_paths,
+            'panorama_id': panorama_id_value
+        }
+    
+    def analyze_point(seq_id: int) -> Dict:
+        data = seq_to_data[seq_id]
+        image_paths = data['images']
+        panorama_id_value = data['panorama_id']
         analysis = call_doubao_vision_api(
             image_paths,
-            vr_product_prompt,  # 使用商品分析提示词
+            vr_product_prompt,
             api_key,
             base_url,
             seq_id,
             panorama_id_value
         )
+        return {
+            'seq_id': seq_id,
+            'panorama_id': panorama_id_value,
+            'images': image_paths,
+            'analysis': analysis
+        }
+    
+    # 仅提交选中的商品点位
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {}
+        for seq_id in product_seq_ids:
+            if seq_id in seq_to_data:
+                futures[executor.submit(analyze_point, seq_id)] = seq_id
         
-        if analysis:
-            # 检查是否有商品数据
-            products = analysis.get('products', [])
+        for future in as_completed(futures):
+            seq_id = futures[future]
+            try:
+                result = future.result()
+            except Exception as e:
+                print(f'[WARN] 点位 {seq_id} 任务执行异常: {e}')
+                with write_lock:
+                    fail_count += 1
+                continue
+            analysis = result['analysis']
+            panorama_id_value = result['panorama_id']
+            image_paths = result['images']
             
-            # # 只为推荐商品计算3D坐标
-            # if products and seq_id in coordinates:
-            #     point_coord = coordinates[seq_id]
-            #     for product in products:
-            #         # 只有推荐商品才计算坐标
-            #         if product.get('is_recommended', False) and 'bbox' in product and product['bbox']:
-            #             try:
-            #                 # 使用模型返回的图片方向（而不是默认的'f'）
-            #                 product_direction = product.get('view_direction', 'f')
-            #                 product_3d = calculate_product_3d_position(
-            #                     product['bbox'],
-            #                     product_direction,  # 使用正确的方向
-            #                     point_coord
-            #                 )
-            #                 product['position_3d'] = product_3d
-            #             except Exception as e:
-            #                 print(f'[WARN] 计算3D坐标失败: {e}')
-            #                 product['position_3d'] = None
-            #         else:
-            #             # 非推荐商品不返回坐标
-            #             product['position_3d'] = None
-            
-            # 只保存有商品的点位
-            if products:
-                product_results.append({
-                    'panorama_id': panorama_id_value,
-                    'seq_id': seq_id,
-                    'images': image_paths,
-                    'products': products
-                })
-                success_count += 1
+            if analysis:
+                products = analysis.get('products', [])
+                if products:
+                    # 为所有商品计算 py_position_3d（基于 bbox 和 view_direction）
+                    if seq_id in coordinates:
+                        point_coord = coordinates[seq_id]
+                        for product in products:
+                            bbox = product.get('bbox')
+                            vdir = product.get('view_direction')
+                            if bbox and vdir:
+                                try:
+                                    py_pos = calculate_product_3d_position(bbox, vdir, point_coord)
+                                    product['py_position_3d'] = py_pos
+                                except Exception as e:
+                                    product['py_position_3d'] = None
+                                    print(f'[WARN] 点位 {seq_id} 商品计算 py_position_3d 失败: {e}')
+
+                    with write_lock:
+                        product_results.append({
+                            'panorama_id': panorama_id_value,
+                            'seq_id': seq_id,
+                            'images': image_paths,
+                            'products': products
+                        })
+                        success_count += 1
+                        # 增量写入品牌结果（不包含店铺分析，稍后补充最终版）
+                        if output_dir:
+                            incremental_brand_result = {
+                                'brand': brand_name,
+                                'product_results': product_results,
+                                'store_analysis': None,
+                                'success_count': success_count,
+                                'fail_count': fail_count
+                            }
+                            save_results(incremental_brand_result, output_dir)
+                else:
+                    print(f'[INFO] 点位 {seq_id} (ID:{panorama_id_value}) 未检测到商品，跳过')
             else:
-                print(f'[INFO] 点位 {seq_id} (ID:{panorama_id_value}) 未检测到商品，跳过')
-        else:
-            print(f'[WARN] 点位 {seq_id} (ID:{panorama_id_value}) 分析失败，跳过')
-            fail_count += 1
+                print(f'[WARN] 点位 {seq_id} (ID:{panorama_id_value}) 分析失败，跳过')
+                with write_lock:
+                    fail_count += 1
     
     # ========== 第二阶段：分析整体店铺环境 ==========
     print('\n[INFO] 第二阶段：分析店铺整体环境...')
@@ -833,13 +866,17 @@ def process_brand(
         )
     
     # ========== 合并结果 ==========
-    return {
+    final_result = {
         'brand': brand_name,
         'product_results': product_results,  # 各点位的商品数据
         'store_analysis': store_analysis,    # 整体店铺环境分析
         'success_count': success_count,
         'fail_count': fail_count
     }
+    # 写入最终结果（包含店铺分析）
+    if output_dir:
+        save_results(final_result, output_dir)
+    return final_result
 
 
 def save_results(brand_result: Dict, output_dir: str):
@@ -984,6 +1021,7 @@ def main():
                 brand_folder,
                 args.api_key,
                 args.base_url,
+                args.output_dir,
                 vr_filter,
                 max_product_points=args.max_product_points,
                 max_store_points=args.max_store_points
