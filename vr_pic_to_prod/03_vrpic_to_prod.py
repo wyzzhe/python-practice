@@ -667,7 +667,7 @@ def process_brand(
     api_key: str,
     base_url: str,
     vr_loc_list: Optional[List[int]] = None,
-    max_product_points: int = 5,
+    max_product_points: int = 10,
     max_store_points: int = 10
 ) -> Dict:
     """
@@ -678,7 +678,7 @@ def process_brand(
         api_key: API 密钥
         base_url: API 基础 URL
         vr_loc_list: VR 点位筛选列表，None 表示处理全部点位
-        max_product_points: 商品分析最大点位数，默认 5 个
+        max_product_points: 商品分析最大点位数，默认 10 个
         max_store_points: 店铺分析最大点位数，默认 10 个
     
     Returns:
@@ -770,27 +770,27 @@ def process_brand(
             # 检查是否有商品数据
             products = analysis.get('products', [])
             
-            # 只为推荐商品计算3D坐标
-            if products and seq_id in coordinates:
-                point_coord = coordinates[seq_id]
-                for product in products:
-                    # 只有推荐商品才计算坐标
-                    if product.get('is_recommended', False) and 'bbox' in product and product['bbox']:
-                        try:
-                            # 使用模型返回的图片方向（而不是默认的'f'）
-                            product_direction = product.get('view_direction', 'f')
-                            product_3d = calculate_product_3d_position(
-                                product['bbox'],
-                                product_direction,  # 使用正确的方向
-                                point_coord
-                            )
-                            product['position_3d'] = product_3d
-                        except Exception as e:
-                            print(f'[WARN] 计算3D坐标失败: {e}')
-                            product['position_3d'] = None
-                    else:
-                        # 非推荐商品不返回坐标
-                        product['position_3d'] = None
+            # # 只为推荐商品计算3D坐标
+            # if products and seq_id in coordinates:
+            #     point_coord = coordinates[seq_id]
+            #     for product in products:
+            #         # 只有推荐商品才计算坐标
+            #         if product.get('is_recommended', False) and 'bbox' in product and product['bbox']:
+            #             try:
+            #                 # 使用模型返回的图片方向（而不是默认的'f'）
+            #                 product_direction = product.get('view_direction', 'f')
+            #                 product_3d = calculate_product_3d_position(
+            #                     product['bbox'],
+            #                     product_direction,  # 使用正确的方向
+            #                     point_coord
+            #                 )
+            #                 product['position_3d'] = product_3d
+            #             except Exception as e:
+            #                 print(f'[WARN] 计算3D坐标失败: {e}')
+            #                 product['position_3d'] = None
+            #         else:
+            #             # 非推荐商品不返回坐标
+            #             product['position_3d'] = None
             
             # 只保存有商品的点位
             if products:
@@ -897,8 +897,8 @@ def main():
     parser.add_argument(
         '--max_product_points',
         type=int,
-        default=5,
-        help='商品分析最大点位数（默认5个）'
+        default=10,
+        help='商品分析最大点位数（默认10个）'
     )
     parser.add_argument(
         '--max_store_points',
